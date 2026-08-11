@@ -169,5 +169,4 @@ out of the dashboard.
 | Server     | Apache (via XAMPP)       |
 
 No frameworks (Laravel, React, Bootstrap, etc.) are used — everything is
-written from scratch, which makes the codebase easy to explain during a
-graduation project defense.
+written from scratch, which makes the codebase easy to explain during a project defense.
