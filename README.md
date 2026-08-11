@@ -1,8 +1,7 @@
 # Guryo Samo — Real Estate Management System
 
-A simple, professional Real Estate Management System built for a university
-graduation project using **pure HTML, CSS, JavaScript, PHP and MySQL**
-(no frameworks). "Guryo Samo" means "Good Homes" in Somali.
+A modern and user-friendly **Real Estate Management System**  using **HTML5, CSS3, JavaScript, PHP, and MySQL** without relying on external frameworks. The system, named **“Guryo Samo”** (“Good Homes” in Somali), is designed to simplify property management, listings, and real estate-related operations through a clean and intuitive platform.
+
 
 ---
 
