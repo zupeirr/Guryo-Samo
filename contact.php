@@ -29,6 +29,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('sssss', $name, $email, $phone, $subject, $message);
             if ($stmt->execute()) {
                 $successMsg = 'Thank you! Your message has been sent. Our team will get back to you soon.';
+                
+                // Send email notification if enabled
+                $emailEnabled = getSetting($conn, 'email_notifications', '0');
+                $notifyInquiry = getSetting($conn, 'notify_new_inquiry', '0');
+                $adminEmail = getSetting($conn, 'notification_email', '');
+                
+                if ($emailEnabled === '1' && $notifyInquiry === '1' && !empty($adminEmail)) {
+                    require_once 'includes/PHPMailer/Exception.php';
+                    require_once 'includes/PHPMailer/PHPMailer.php';
+                    require_once 'includes/PHPMailer/SMTP.php';
+                    
+                    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+                    try {
+                        $mail->isSMTP();
+                        $mail->Host       = getSetting($conn, 'smtp_host', '');
+                        $mail->SMTPAuth   = true;
+                        $mail->Username   = getSetting($conn, 'smtp_username', '');
+                        $mail->Password   = getSetting($conn, 'smtp_password', '');
+                        
+                        $encryption = getSetting($conn, 'smtp_encryption', 'tls');
+                        if ($encryption === 'tls') {
+                            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+                        } elseif ($encryption === 'ssl') {
+                            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+                        }
+                        
+                        $mail->Port = (int)getSetting($conn, 'smtp_port', '587');
+                        
+                        $siteName = getSetting($conn, 'site_name', 'Guryo Samo');
+                        $mail->setFrom($mail->Username, $siteName . ' System');
+                        $mail->addAddress($adminEmail);
+                        
+                        $mail->isHTML(true);
+                        $mail->Subject = 'New Inquiry: ' . ($subject ? $subject : 'No Subject');
+                        
+                        $body = "<h2>New Property Inquiry Received</h2>";
+                        $body .= "<p><strong>Name:</strong> " . htmlspecialchars($name) . "</p>";
+                        $body .= "<p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>";
+                        $body .= "<p><strong>Phone:</strong> " . htmlspecialchars($phone) . "</p>";
+                        $body .= "<p><strong>Message:</strong><br>" . nl2br(htmlspecialchars($message)) . "</p>";
+                        
+                        $mail->Body = $body;
+                        $mail->send();
+                    } catch (Exception $e) {
+                        // Silently fail if email doesn't send, we don't want to show users a white screen
+                        error_log('PHPMailer Error: ' . $mail->ErrorInfo);
+                    }
+                }
+
             } else {
                 $errorMsg = 'Something went wrong while sending your message. Please try again.';
             }
