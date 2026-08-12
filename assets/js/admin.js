@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // ---- Sidebar dropdown groups ----
+    document.querySelectorAll('.nav-group-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            this.closest('.nav-group').classList.toggle('open');
+        });
+    });
+
     // ---- Confirm before deleting a property or message ----
     document.querySelectorAll('.js-confirm-delete').forEach(function (link) {
         link.addEventListener('click', function (e) {
