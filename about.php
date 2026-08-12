@@ -85,9 +85,9 @@ include 'includes/header.php';
         </div>
         <div class="team-grid">
             <div class="team-card">
-                <div class="avatar-circle">HZ</div>
-                <h3 style="font-size:1.05rem;">Hamze Zakarie</h3>
-                <p style="color:var(--ink-soft); font-size:0.86rem; margin-top:4px;">Founder &amp; Managing Director</p>
+                <div class="avatar-circle">S</div>
+                <h3 style="font-size:1.05rem;">Suber Sulub</h3>
+                <p style="color:var(--ink-soft); font-size:0.86rem; margin-top:4px;">Founder & CTO ; Managing Director</p>
             </div>
             <div class="team-card">
                 <div class="avatar-circle">RM</div>

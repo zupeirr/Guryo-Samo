@@ -60,21 +60,21 @@ include 'includes/header.php';
                     <div class="icon-box">📍</div>
                     <div>
                         <h4 style="font-size:0.98rem;">Office Address</h4>
-                        <p style="color:var(--ink-soft); font-size:0.9rem;">Airport Road, Hargeisa, Somaliland</p>
+                        <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'address', 'Airport Road, Hargeisa, Somaliland')); ?></p>
                     </div>
                 </div>
                 <div class="contact-info-item">
                     <div class="icon-box">📞</div>
                     <div>
                         <h4 style="font-size:0.98rem;">Phone</h4>
-                        <p style="color:var(--ink-soft); font-size:0.9rem;">+252 63 4567890</p>
+                        <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'contact_phone', '+252 63 4567890')); ?></p>
                     </div>
                 </div>
                 <div class="contact-info-item">
                     <div class="icon-box">✉️</div>
                     <div>
                         <h4 style="font-size:0.98rem;">Email</h4>
-                        <p style="color:var(--ink-soft); font-size:0.9rem;">info@guryosamo.com</p>
+                        <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'contact_email', 'info@guryosamo.com')); ?></p>
                     </div>
                 </div>
                 <div class="contact-info-item">
