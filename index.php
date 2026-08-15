@@ -43,12 +43,12 @@ include 'includes/header.php';
                 <label for="q_type">Property Type</label>
                 <select id="q_type" name="type">
                     <option value="">Any Type</option>
-                    <option value="Apartment">Apartment</option>
-                    <option value="Villa">Villa</option>
                     <option value="House">House</option>
-                    <option value="Studio">Studio</option>
-                    <option value="Office">Office</option>
+                    <option value="Apartment">Apartment</option>
                     <option value="Land">Land</option>
+                    <option value="Office">Office</option>
+                    <option value="Commercial">Commercial</option>
+                    <option value="Villa">Villa</option>
                 </select>
             </div>
             <div class="field">
