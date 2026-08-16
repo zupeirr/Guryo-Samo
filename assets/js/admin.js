@@ -55,4 +55,53 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(function () { alert.remove(); }, 400);
         }, 4500);
     });
+
+    // ---- Tab navigation (Reports & Analytics and Settings pages) ----
+    // Reads URL hash on page load so direct links like reports.php#expenses work.
+    function activateTab(tabId) {
+        var sections = document.querySelectorAll('.settings-section');
+        var tabLinks = document.querySelectorAll('[data-tab]');
+        if (!sections.length) return;
+
+        sections.forEach(function (s) {
+            s.style.display = 'none';
+            s.classList.remove('active');
+        });
+        tabLinks.forEach(function (a) { a.classList.remove('active'); });
+
+        var target = document.getElementById(tabId);
+        if (target) {
+            target.style.display = '';
+            target.classList.add('active');
+        } else if (sections[0]) {
+            sections[0].style.display = '';
+            sections[0].classList.add('active');
+        }
+
+        var activeLink = document.querySelector('[data-tab="' + tabId + '"]');
+        if (activeLink) activeLink.classList.add('active');
+    }
+
+    document.querySelectorAll('[data-tab]').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            var tabId = this.getAttribute('data-tab');
+            activateTab(tabId);
+            history.replaceState(null, '', '#' + tabId);
+        });
+    });
+
+    // Activate tab based on URL hash on page load
+    (function () {
+        var tabLinks = document.querySelectorAll('[data-tab]');
+        if (!tabLinks.length) return;
+        var hash = window.location.hash.replace('#', '');
+        if (hash) {
+            activateTab(hash);
+        } else {
+            var first = tabLinks[0];
+            if (first) activateTab(first.getAttribute('data-tab'));
+        }
+    })();
+
 });
