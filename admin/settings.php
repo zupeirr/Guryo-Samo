@@ -31,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ss($conn, 'contact_phone', trim($_POST['contact_phone'] ?? ''));
         ss($conn, 'currency',      trim($_POST['currency']      ?? 'USD'));
         ss($conn, 'address',       trim($_POST['address']       ?? ''));
+        ss($conn, 'social_facebook', trim($_POST['social_facebook'] ?? ''));
+        ss($conn, 'social_whatsapp', trim($_POST['social_whatsapp'] ?? ''));
+        ss($conn, 'social_tiktok',   trim($_POST['social_tiktok']   ?? ''));
         $success = '✅ General settings saved.';
         $activeTab = 'general';
 
@@ -165,6 +168,29 @@ include 'includes/admin-header.php';
                     <input type="text" id="address" name="address"
                            value="<?php echo htmlspecialchars(getSetting($conn,'address','')); ?>"
                            placeholder="Hargeisa, Somalia">
+                </div>
+            </div>
+
+            <div class="form-divider"></div>
+            <div class="form-section-label">🌐 Social Media Links</div>
+            <div class="form-grid-2">
+                <div class="field-block">
+                    <label for="social_facebook">Facebook URL</label>
+                    <input type="url" id="social_facebook" name="social_facebook"
+                           value="<?php echo htmlspecialchars(getSetting($conn,'social_facebook','')); ?>"
+                           placeholder="https://facebook.com/yourpage">
+                </div>
+                <div class="field-block">
+                    <label for="social_whatsapp">WhatsApp URL</label>
+                    <input type="url" id="social_whatsapp" name="social_whatsapp"
+                           value="<?php echo htmlspecialchars(getSetting($conn,'social_whatsapp','')); ?>"
+                           placeholder="https://wa.me/252634567890">
+                </div>
+                <div class="field-block">
+                    <label for="social_tiktok">TikTok URL</label>
+                    <input type="url" id="social_tiktok" name="social_tiktok"
+                           value="<?php echo htmlspecialchars(getSetting($conn,'social_tiktok','')); ?>"
+                           placeholder="https://tiktok.com/@yourprofile">
                 </div>
             </div>
 
