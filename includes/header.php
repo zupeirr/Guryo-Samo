@@ -27,6 +27,7 @@ if (!isset($activePage)) { $activePage = ''; }
         <nav class="nav-links" id="navLinks">
             <a href="<?php echo $baseUrl ?? ''; ?>index.php" class="<?php echo $activePage === 'home' ? 'active' : ''; ?>">Home</a>
             <a href="<?php echo $baseUrl ?? ''; ?>properties.php" class="<?php echo $activePage === 'properties' ? 'active' : ''; ?>">Properties</a>
+            <a href="<?php echo $baseUrl ?? ''; ?>services.php" class="<?php echo $activePage === 'services' ? 'active' : ''; ?>">Services</a>
             <a href="<?php echo $baseUrl ?? ''; ?>about.php" class="<?php echo $activePage === 'about' ? 'active' : ''; ?>">About Us</a>
             <a href="<?php echo $baseUrl ?? ''; ?>contact.php" class="<?php echo $activePage === 'contact' ? 'active' : ''; ?>">Contact</a>
         </nav>
