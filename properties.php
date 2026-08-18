@@ -12,7 +12,7 @@ $type     = isset($_GET['type']) ? trim($_GET['type']) : '';
 $status   = isset($_GET['status']) ? trim($_GET['status']) : '';
 $maxPrice = isset($_GET['max_price']) && $_GET['max_price'] !== '' ? (float)$_GET['max_price'] : null;
 
-$allowedTypes = ['Apartment','Villa','House','Studio','Office','Land'];
+$allowedTypes = ['House','Apartment','Land','Office','Commercial','Villa'];
 $allowedStatus = ['For Sale','For Rent','Sold'];
 
 // ---- Build query safely with prepared statement ----
