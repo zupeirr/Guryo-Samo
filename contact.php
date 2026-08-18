@@ -106,31 +106,31 @@ include 'includes/header.php';
                 <h2 class="section-title">Contact Information</h2>
 
                 <div class="contact-info-item">
-                    <div class="icon-box">📍</div>
+                    <div class="icon-box" style="color:var(--gold-600);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
                     <div>
-                        <h4 style="font-size:0.98rem;">Office Address</h4>
-                        <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'address', 'Airport Road, Hargeisa, Somaliland')); ?></p>
+                        <h4 style="font-size:0.98rem;">Office</h4>
+                        <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'address', 'Hargeisa, Somaliland')); ?></p>
                     </div>
                 </div>
                 <div class="contact-info-item">
-                    <div class="icon-box">📞</div>
+                    <div class="icon-box" style="color:var(--gold-600);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
                     <div>
-                        <h4 style="font-size:0.98rem;">Phone</h4>
-                        <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'contact_phone', '+252 63 4567890')); ?></p>
+                        <h4 style="font-size:0.98rem;">Call us</h4>
+                        <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'contact_phone', '+252 63 6097266')); ?></p>
                     </div>
                 </div>
                 <div class="contact-info-item">
-                    <div class="icon-box">✉️</div>
+                    <div class="icon-box" style="color:var(--gold-600);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
                     <div>
-                        <h4 style="font-size:0.98rem;">Email</h4>
+                        <h4 style="font-size:0.98rem;">Email us</h4>
                         <p style="color:var(--ink-soft); font-size:0.9rem;"><?php echo clean(getSetting($conn, 'contact_email', 'info@guryosamo.com')); ?></p>
                     </div>
                 </div>
                 <div class="contact-info-item">
-                    <div class="icon-box">🕒</div>
+                    <div class="icon-box" style="color:var(--gold-600);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
                     <div>
-                        <h4 style="font-size:0.98rem;">Office Hours</h4>
-                        <p style="color:var(--ink-soft); font-size:0.9rem;">Monday &ndash; Friday: 9:00 AM &ndash; 6:00 PM</p>
+                        <h4 style="font-size:0.98rem;">Opening hours</h4>
+                        <p style="color:var(--ink-soft); font-size:0.9rem;">Mon &ndash; Sat &middot; 8:00 AM &ndash; 6:00 PM</p>
                     </div>
                 </div>
             </div>
@@ -159,8 +159,17 @@ include 'includes/header.php';
                             <div class="field"><input type="text" id="phone" name="phone" placeholder="+252 63 1234567"></div>
                         </div>
                         <div class="field-block">
-                            <label for="subject" style="font-size:0.84rem; font-weight:600; display:block; margin-bottom:6px;">Subject</label>
-                            <div class="field"><input type="text" id="subject" name="subject" placeholder="How can we help?"></div>
+                            <label for="subject" style="font-size:0.84rem; font-weight:600; display:block; margin-bottom:6px;">How can we help?</label>
+                            <div class="field">
+                                <select id="subject" name="subject" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter', sans-serif;">
+                                    <option value="" disabled selected>Select an option...</option>
+                                    <option value="I'm looking to buy">I'm looking to buy</option>
+                                    <option value="I'm looking to rent">I'm looking to rent</option>
+                                    <option value="I want to sell a property">I want to sell a property</option>
+                                    <option value="I want to list a property">I want to list a property</option>
+                                    <option value="General inquiry">General inquiry</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="field-block">
@@ -168,7 +177,22 @@ include 'includes/header.php';
                         <div class="field"><textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea></div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+                    <p style="text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-top: 12px;">We usually respond within one business day.</p>
                 </form>
+
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border);">
+                    <h4 style="font-size: 1.05rem; margin-bottom: 16px;">Prefer a quick conversation?</h4>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <a href="https://wa.me/252636097266" target="_blank" class="btn" style="background:#25D366; color:#fff;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                            WhatsApp Us
+                        </a>
+                        <a href="tel:+252636097266" class="btn btn-ghost">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            Call Us
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
