@@ -23,10 +23,15 @@ include 'includes/header.php';
 <!-- Services Grid Section -->
 <section class="section services-section" style="background-color: #f7f9fc; padding: 70px 0 90px;">
     <div class="container">
-        <div class="section-head" style="margin-bottom: 50px;">
-            <span class="eyebrow">WHAT WE OFFER</span>
-            <h2 class="section-title" style="font-size: 2.2rem;">Tailored Services for Every Property Need</h2>
-            <p class="section-sub">Whether you are buying, renting, selling, or managing property, our platform and expert agents are here to help.</p>
+        <div class="section-head services-section-head">
+            <div class="eyebrow-wrapper">
+                <span class="eyebrow-line"></span>
+                <span class="eyebrow" style="margin-bottom:0;">WHAT WE OFFER</span>
+                <span class="eyebrow-line"></span>
+            </div>
+            <h2 class="section-title" style="font-size: 2.4rem; max-width: 600px; margin: 16px auto 20px; line-height: 1.3;">Tailored Services for Every Property Need</h2>
+            <p class="section-sub" style="max-width: 580px; margin: 0 auto 28px; font-size: 1.05rem;">Whether you are buying, renting, selling, or managing property, our platform and expert agents are here to help.</p>
+            <div class="services-count-badge">6 SERVICES</div>
         </div>
 
         <div class="services-grid">
@@ -34,7 +39,9 @@ include 'includes/header.php';
             <div class="service-card">
                 <div>
                     <div class="service-card-header">
-                        <div class="service-icon-wrapper">🏠</div>
+                        <div class="service-icon-wrapper">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        </div>
                         <span class="service-badge">Buying</span>
                     </div>
                     <h3>Property Buying</h3>
@@ -52,7 +59,9 @@ include 'includes/header.php';
             <div class="service-card">
                 <div>
                     <div class="service-card-header">
-                        <div class="service-icon-wrapper">🔑</div>
+                        <div class="service-icon-wrapper">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+                        </div>
                         <span class="service-badge">Renting</span>
                     </div>
                     <h3>Property Renting</h3>
@@ -70,7 +79,9 @@ include 'includes/header.php';
             <div class="service-card">
                 <div>
                     <div class="service-card-header">
-                        <div class="service-icon-wrapper">🏷️</div>
+                        <div class="service-icon-wrapper">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                        </div>
                         <span class="service-badge">Selling</span>
                     </div>
                     <h3>Property Selling</h3>
@@ -88,7 +99,9 @@ include 'includes/header.php';
             <div class="service-card">
                 <div>
                     <div class="service-card-header">
-                        <div class="service-icon-wrapper">🏢</div>
+                        <div class="service-icon-wrapper">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+                        </div>
                         <span class="service-badge">Management</span>
                     </div>
                     <h3>Property Management</h3>
@@ -106,7 +119,9 @@ include 'includes/header.php';
             <div class="service-card">
                 <div>
                     <div class="service-card-header">
-                        <div class="service-icon-wrapper">🧑‍💼</div>
+                        <div class="service-icon-wrapper">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
                         <span class="service-badge">Consultation</span>
                     </div>
                     <h3>Real Estate Consultation</h3>
@@ -124,7 +139,9 @@ include 'includes/header.php';
             <div class="service-card">
                 <div>
                     <div class="service-card-header">
-                        <div class="service-icon-wrapper">🛡️</div>
+                        <div class="service-icon-wrapper">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                        </div>
                         <span class="service-badge">Verification</span>
                     </div>
                     <h3>Property Verification</h3>
@@ -149,7 +166,7 @@ include 'includes/header.php';
             <p>Get in touch with our team of property experts today. We are here to answer your questions and guide you every step of the way.</p>
             <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
                 <a href="contact.php" class="btn btn-primary">Get in Touch</a>
-                <a href="properties.php" class="btn btn-outline">Explore Properties</a>
+                <a href="properties.php" class="btn btn-outline-gold">Explore Properties</a>
             </div>
         </div>
     </div>
