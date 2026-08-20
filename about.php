@@ -82,7 +82,7 @@ include 'includes/header.php';
                 <div class="mv-number">01</div>
                 <div class="mv-content">
                     <span class="eyebrow">OUR MISSION</span>
-                    <p>Connect people with properties that genuinely fit their lives through honest information and dependable service.</p>
+                    <p>To connect people with properties that fit their needs through honest information, trusted guidance, and dependable service.</p>
                 </div>
             </div>
             <div class="mv-card">
@@ -137,7 +137,7 @@ include 'includes/header.php';
 </section>
 
 <!-- 6. How We Work (Timeline) -->
-<section class="section bg-alt" style="padding: 100px 0;">
+<section id="how-we-work" class="section bg-alt" style="padding: 100px 0;">
     <div class="container">
         <div class="section-head">
             <span class="eyebrow">HOW WE WORK</span>
@@ -276,6 +276,26 @@ document.addEventListener("DOMContentLoaded", function() {
     const statsSection = document.querySelector('.stats-section');
     if (statsSection) {
         observer.observe(statsSection);
+    }
+
+    // How We Work Animation
+    const howWeWork = document.getElementById('how-we-work');
+    if (howWeWork) {
+        const howObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    howWeWork.classList.add('animate-in');
+                    const steps = howWeWork.querySelectorAll('.timeline-step');
+                    steps.forEach((step, index) => {
+                        setTimeout(() => {
+                            step.classList.add('animate-in');
+                        }, 200 + (index * 150));
+                    });
+                    howObserver.unobserve(howWeWork);
+                }
+            });
+        }, { threshold: 0.3 });
+        howObserver.observe(howWeWork);
     }
 });
 </script>
