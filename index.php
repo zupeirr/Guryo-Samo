@@ -25,7 +25,7 @@ include 'includes/header.php';
             <h1>Discover a home that fits the life you're building.</h1>
             <p>Browse verified listings for sale and for rent across the city &mdash; from cozy studios to spacious family villas.</p>
             <div class="hero-actions">
-                <a href="properties.php" class="btn btn-primary">Browse Properties</a>
+                <a href="properties.php" class="btn btn-primary">Browse Properties <span class="btn-arrow">&rarr;</span></a>
                 <a href="contact.php" class="btn btn-outline">Contact an Agent</a>
             </div>
         </div>
@@ -62,7 +62,7 @@ include 'includes/header.php';
     </form>
 </div>
 
-<section style="padding: 24px 0 48px;">
+<section style="padding: 20px 0 32px;">
     <div class="container">
         <div class="stats-strip">
             <div class="stat">
@@ -173,9 +173,7 @@ include 'includes/header.php';
                 </div>
                 <h3>Verified Listings</h3>
                 <p>Every property is carefully reviewed by our team before it appears on Guryo Samo. No guesswork, no surprises.</p>
-                <span class="why-arrow">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </span>
+                <a href="services.php" class="why-cta">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
             </div>
 
             <!-- Card 2 -->
@@ -185,9 +183,7 @@ include 'includes/header.php';
                 </div>
                 <h3>Transparent Pricing</h3>
                 <p>Know exactly what you're paying. Clear, honest pricing with no hidden fees or unexpected costs at any stage.</p>
-                <span class="why-arrow">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </span>
+                <a href="services.php" class="why-cta">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
             </div>
 
             <!-- Card 3 -->
@@ -197,9 +193,7 @@ include 'includes/header.php';
                 </div>
                 <h3>Dedicated Support</h3>
                 <p>Our team is here to guide you through every step of your property journey &mdash; from search to final handover.</p>
-                <span class="why-arrow">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                </span>
+                <a href="contact.php" class="why-cta">Learn More <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
             </div>
         </div>
 
