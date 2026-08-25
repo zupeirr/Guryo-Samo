@@ -33,10 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($id > 0) {
         $s = $conn->prepare("UPDATE construction_materials SET project_id=?,name=?,category=?,unit=?,quantity=?,unit_cost=?,supplier=?,stock_level=?,reorder_point=? WHERE id=?");
-        $s->bind_param('isssddssddi', $project_id,$name,$category,$unit,$quantity,$unit_cost,$supplier,$stock_level,$reorder_point,$id);
+        $s->bind_param('isssddsddi', $project_id,$name,$category,$unit,$quantity,$unit_cost,$supplier,$stock_level,$reorder_point,$id);
     } else {
         $s = $conn->prepare("INSERT INTO construction_materials (project_id,name,category,unit,quantity,unit_cost,supplier,stock_level,reorder_point) VALUES (?,?,?,?,?,?,?,?,?)");
-        $s->bind_param('isssddssd', $project_id,$name,$category,$unit,$quantity,$unit_cost,$supplier,$stock_level,$reorder_point);
+        $s->bind_param('isssddsdd', $project_id,$name,$category,$unit,$quantity,$unit_cost,$supplier,$stock_level,$reorder_point);
     }
     $s->execute();
     redirect('construction-materials.php?saved=1');
@@ -88,11 +88,11 @@ include 'includes/admin-header.php';
 <?php if (isset($_GET['deleted'])): ?><div class="alert alert-success">Material deleted.</div><?php endif; ?>
 
 <?php if ($action === 'add' || $action === 'edit'): ?>
-<div style="margin-bottom:12px;"><a href="construction-materials.php" class="btn btn-ghost btn-sm">← Back to Inventory</a></div>
+<div style="margin-bottom:12px;"><a href="construction-materials.php" class="btn btn-ghost btn-sm" style="display:inline-flex; align-items:center; gap:5px;"><i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Inventory</a></div>
 <div class="panel">
     <div class="panel-head"><h2><?php echo $editItem ? 'Edit Material' : 'Add Material / Inventory Item'; ?></h2></div>
     <div class="panel-body">
-        <form method="POST" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:720px;">
+        <form method="POST" class="admin-form" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:720px;">
             <?php if($editItem): ?><input type="hidden" name="id" value="<?php echo $editItem['id']; ?>"><?php endif; ?>
             <div style="grid-column:span 2;">
                 <label class="form-label">Material Name *</label>
@@ -136,7 +136,7 @@ include 'includes/admin-header.php';
                 <input type="text" name="supplier" class="form-control" value="<?php echo clean($editItem['supplier'] ?? ''); ?>">
             </div>
             <div style="grid-column:span 2; display:flex; gap:10px;">
-                <button type="submit" class="btn btn-primary">💾 Save</button>
+                <button type="submit" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:6px;"><i data-lucide="save" style="width:15px;height:15px;"></i> Save</button>
                 <a href="construction-materials.php" class="btn btn-ghost">Cancel</a>
             </div>
         </form>
@@ -146,9 +146,9 @@ include 'includes/admin-header.php';
 <?php else: ?>
 <!-- KPI strip -->
 <div class="dash-stats" style="margin-bottom:1.5rem; grid-template-columns:repeat(3,1fr);">
-    <div class="dash-card"><div class="ic-wrap blue">🧱</div><div><h3><?php echo number_format($totalRows); ?></h3><span>Total Materials</span></div></div>
-    <div class="dash-card"><div class="ic-wrap <?php echo $lowStockCount>0?'red':'green'; ?>">⚠️</div><div><h3><?php echo $lowStockCount; ?></h3><span>Low Stock Alerts</span></div></div>
-    <div class="dash-card"><div class="ic-wrap green">💰</div><div><h3><?php echo formatPrice($totalValue); ?></h3><span>Total Inventory Value</span></div></div>
+    <div class="dash-card"><div class="ic-wrap blue"><i data-lucide="package" style="width:20px;height:20px;"></i></div><div><h3><?php echo number_format($totalRows); ?></h3><span>Total Materials</span></div></div>
+    <div class="dash-card"><div class="ic-wrap <?php echo $lowStockCount>0?'red':'green'; ?>"><i data-lucide="alert-triangle" style="width:20px;height:20px;"></i></div><div><h3><?php echo $lowStockCount; ?></h3><span>Low Stock Alerts</span></div></div>
+    <div class="dash-card"><div class="ic-wrap green"><i data-lucide="circle-dollar-sign" style="width:20px;height:20px;"></i></div><div><h3><?php echo formatPrice($totalValue); ?></h3><span>Total Inventory Value</span></div></div>
 </div>
 
 <div class="panel">
@@ -166,7 +166,7 @@ include 'includes/admin-header.php';
                 <?php endwhile; ?>
             </select>
             <?php if($lowStockCount > 0): ?>
-            <a href="construction-materials.php?low_stock=1" class="btn btn-sm" style="background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5;">⚠ Low Stock (<?php echo $lowStockCount; ?>)</a>
+            <a href="construction-materials.php?low_stock=1" class="btn btn-sm" style="background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; display:inline-flex; align-items:center; gap:5px;"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Low Stock (<?php echo $lowStockCount; ?>)</a>
             <?php endif; ?>
             <button type="submit" class="btn btn-ghost btn-sm">Filter</button>
             <?php if($filterLow||$filterProj||$q): ?><a href="construction-materials.php" class="btn btn-ghost btn-sm">✕ Clear</a><?php endif; ?>
@@ -188,7 +188,7 @@ include 'includes/admin-header.php';
                     <td><?php echo $m['quantity']; ?> <?php echo clean($m['unit']); ?></td>
                     <td>
                         <span style="font-weight:700; color:<?php echo $lowS?'#dc2626':'var(--navy-900)'; ?>"><?php echo $m['stock_level']; ?> <?php echo clean($m['unit']); ?></span>
-                        <?php if($lowS): ?><br><span style="font-size:0.7rem; color:#dc2626;">⚠ Low Stock</span><?php endif; ?>
+                        <?php if($lowS): ?><br><span style="font-size:0.7rem; color:#dc2626; display:inline-flex; align-items:center; gap:3px;"><i data-lucide="alert-triangle" style="width:11px;height:11px;"></i> Low Stock</span><?php endif; ?>
                     </td>
                     <td><?php echo formatPrice($m['unit_cost']); ?></td>
                     <td><?php echo formatPrice($totalVal); ?></td>

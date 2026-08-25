@@ -126,7 +126,7 @@ include 'includes/admin-header.php';
 <div class="panel">
     <div class="panel-head"><h2><?php echo $editItem ? 'Edit Document' : 'Upload Document'; ?></h2></div>
     <div class="panel-body">
-        <form method="POST" enctype="multipart/form-data" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:720px;">
+        <form method="POST" enctype="multipart/form-data" class="admin-form" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:720px;">
             <?php if($editItem): ?>
                 <input type="hidden" name="id" value="<?php echo $editItem['id']; ?>">
                 <input type="hidden" name="existing_file_name" value="<?php echo clean($editItem['file_name']); ?>">
