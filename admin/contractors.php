@@ -95,7 +95,7 @@ include 'includes/admin-header.php';
 <div class="panel">
     <div class="panel-head"><h2><?php echo $editItem ? 'Edit Profile' : 'Add Contractor / Worker'; ?></h2></div>
     <div class="panel-body">
-        <form method="POST" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:720px;">
+        <form method="POST" class="admin-form" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:720px;">
             <?php if($editItem): ?><input type="hidden" name="id" value="<?php echo $editItem['id']; ?>"><?php endif; ?>
             <div style="grid-column:span 2;">
                 <label class="form-label">Full Name *</label>
