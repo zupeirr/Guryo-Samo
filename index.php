@@ -33,7 +33,7 @@ include 'includes/header.php';
 </section>
 
 <div class="container">
-    <form class="search-card" action="properties.php" method="get" id="searchForm">
+    <form class="search-card" action="properties.php" method="get" id="searchForm"> 
         <div class="search-grid">
             <div class="field">
                 <label for="q_location">Location</label>
@@ -41,7 +41,7 @@ include 'includes/header.php';
             </div>
             <div class="field">
                 <label for="q_type">Property Type</label>
-                <select id="q_type" name="type">
+                <select id="q_type" name="type"> <!--select waa dropdown menu ,Waxay user-ka siinaysaa inuu hal option ka doorto-->
                     <option value="">Any Type</option>
                     <option value="House">House</option>
                     <option value="Apartment">Apartment</option>
@@ -69,7 +69,7 @@ include 'includes/header.php';
                 <div class="stat-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 </div>
-                <h3 class="counter" data-target="<?php echo (int)$totalProperties; ?>">0</h3>
+                <h3 class="counter" data-target="<?php echo (int)$totalProperties; ?>">0</h3> <!--data-target="42" = Stores this in a data attribute -->
                 <span>Properties</span>
             </div>
             <div class="stat">
@@ -106,9 +106,9 @@ include 'includes/header.php';
         </div>
 
         <div class="property-grid">
-            <?php if ($featured->num_rows > 0): while ($p = $featured->fetch_assoc()):
-                $statusClass = $p['status'] === 'For Sale' ? 'sale' : ($p['status'] === 'For Rent' ? 'rent' : 'sold');
-                $imgSrc = ($p['image'] && $p['image'] !== 'no-image.jpg') ? 'uploads/' . $p['image'] : 'assets/images/no-image.jpg';
+            <?php if ($featured->num_rows > 0): while ($p = $featured->fetch_assoc()):                   //--loop oo hubinaya haddii database-ka laga helay properties,kadibna mid-mid ayuu u soo qaadanayaa -->
+                $statusClass = $p['status'] === 'For Sale' ? 'sale' : ($p['status'] === 'For Rent' ? 'rent' : 'sold');            //--- This is a ternary operator (if/else)
+                $imgSrc = ($p['image'] && $p['image'] !== 'no-image.jpg') ? 'image.php?type=property&id=' . $p['id'] : 'assets/images/no-image.jpg';
             ?>
             <div class="property-card">
                 <div class="property-thumb">
@@ -116,7 +116,7 @@ include 'includes/header.php';
                     <button class="favorite-btn" aria-label="Save to favorites">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     </button>
-                    <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($p['title']); ?>" onerror="this.src='assets/images/no-image.jpg'">
+                    <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($p['title']); ?>" onerror="this.src='assets/images/no-image.jpg'">  <!--//---onerror = If image fails to load, show placeholder -->
                 </div>
                 <div class="property-body">
                     <div class="property-price"><?php echo formatPrice($p['price']); ?><?php echo $p['status'] === 'For Rent' ? ' / mo' : ''; ?></div>
@@ -216,6 +216,5 @@ include 'includes/header.php';
         </div>
     </div>
 </section>
-
 
 <?php include 'includes/footer.php'; ?>
