@@ -1,284 +1,439 @@
--- ============================================================
--- Real Estate Management System - Database Schema
--- Import this file into phpMyAdmin (or run via MySQL CLI)
--- ============================================================
+-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
+--
+-- Host: localhost    Database: real_estate_db
+-- ------------------------------------------------------
+-- Server version	10.4.32-MariaDB
 
-CREATE DATABASE IF NOT EXISTS real_estate_db
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-USE real_estate_db;
+--
+-- Table structure for table `agents`
+--
 
--- ------------------------------------------------------------
--- Table: users
--- Stores THREE kinds of accounts, told apart by the "role" column:
---   admin    -> full access to the Admin Dashboard
---   staff    -> same access as admin (kept separate for future use)
---   customer -> a normal visitor who signed up on the public
---               Register page (register.php); can log in but
---               cannot open the Admin Dashboard.
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,               -- always a bcrypt hash, never plain text
-    role ENUM('admin','staff','customer') NOT NULL DEFAULT 'customer',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `agents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `agents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `specialization` varchar(100) DEFAULT NULL,
+  `commission_rate` decimal(5,2) DEFAULT 0.00,
+  `status` varchar(50) DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Default admin account -> username: admin | password: Admin@123
--- (password below is a bcrypt hash generated with PHP password_hash())
-INSERT INTO users (full_name, username, email, password, role)
-VALUES ('System Administrator', 'admin', 'admin@realestate.com',
-        '$2y$10$VEwKRzR44lgKwyKdw7zmTuVh8BXPZlW6sBBeLobdJB2JuCoowdckO', 'admin');
--- NOTE: The hash above corresponds to the password "Admin@123".
+--
+-- Table structure for table `appointments`
+--
 
--- ------------------------------------------------------------
--- Table: properties
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS properties (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    property_ref VARCHAR(50) UNIQUE,
-    title VARCHAR(150) NOT NULL,
-    type ENUM('House','Apartment','Land','Office','Commercial','Villa') NOT NULL DEFAULT 'Apartment',
-    price DECIMAL(12,2) NOT NULL,
-    location VARCHAR(150) NOT NULL,
-    description TEXT,
-    bedrooms INT DEFAULT 0,
-    bathrooms INT DEFAULT 0,
-    size DECIMAL(10,2) DEFAULT 0,          -- size in square meters
-    status ENUM('For Sale','For Rent','Sold') NOT NULL DEFAULT 'For Sale',
-    image VARCHAR(255) DEFAULT 'no-image.jpg',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `appointments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `appointments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `property_id` int(11) DEFAULT NULL,
+  `construction_project_id` int(11) DEFAULT NULL,
+  `agent_id` int(11) DEFAULT NULL,
+  `customer_name` varchar(100) DEFAULT NULL,
+  `customer_email` varchar(100) DEFAULT NULL,
+  `customer_phone` varchar(30) DEFAULT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `scheduled_at` datetime DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'Pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Sample properties
-INSERT INTO properties (title, type, price, location, description, bedrooms, bathrooms, size, status, image) VALUES
-('Modern Family Villa', 'Villa', 250000.00, 'Hargeisa, Jigjiga Yar', 'A spacious modern villa with a private garden, open-plan kitchen, and abundant natural light. Perfect for families looking for comfort and style.', 4, 3, 320.00, 'For Sale', 'no-image.jpg'),
-('Cozy City Apartment', 'Apartment', 1200.00, 'Hargeisa, State House', 'A cozy two-bedroom apartment located in the heart of the city, close to shops, restaurants, and public transport.', 2, 1, 85.00, 'For Rent', 'no-image.jpg'),
-('Luxury Penthouse Suite', 'Apartment', 450000.00, 'Berbera, Coastal Road', 'An elegant penthouse with panoramic ocean views, high ceilings, and premium finishes throughout.', 3, 2, 210.00, 'For Sale', 'no-image.jpg'),
-('Downtown Studio', 'Studio', 850.00, 'Hargeisa, 26 June', 'A compact and efficient studio ideal for students or young professionals, fully furnished.', 1, 1, 40.00, 'For Rent', 'no-image.jpg'),
-('Suburban Family House', 'House', 315000.00, 'Boorama', 'A charming family house with a large backyard, garage, and quiet neighborhood setting.', 5, 3, 260.00, 'Sold', 'no-image.jpg');
+--
+-- Table structure for table `budgets`
+--
 
--- ------------------------------------------------------------
--- Table: messages (customer contact messages)
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    phone VARCHAR(30),
-    subject VARCHAR(150),
-    message TEXT NOT NULL,
-    is_read TINYINT(1) NOT NULL DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `budgets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `budgets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `department` varchar(100) DEFAULT NULL,
+  `allocated_amount` decimal(15,2) DEFAULT 0.00,
+  `spent_amount` decimal(15,2) DEFAULT 0.00,
+  `period_type` varchar(50) DEFAULT NULL,
+  `period_label` varchar(100) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- ------------------------------------------------------------
--- Table: settings
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS settings (
-    setting_key VARCHAR(50) PRIMARY KEY,
-    setting_value TEXT
-) ENGINE=InnoDB;
+--
+-- Table structure for table `construction_documents`
+--
 
-INSERT IGNORE INTO settings (setting_key, setting_value) VALUES 
-('site_name', 'Guryo Samo'),
-('site_tagline', 'Helping people find the right place to call home. Browse our listings or reach out and our team will help you find a property that fits your needs.'),
-('address', 'Airport Road, Hargeisa, Somaliland'),
-('contact_phone', '+252 63 4567890'),
-('contact_email', 'info@guryosamo.com'),
-('social_facebook', '#'),
-('social_whatsapp', '#'),
-('social_tiktok', '#');
-USE real_estate_db;
+DROP TABLE IF EXISTS `construction_documents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `construction_documents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) DEFAULT NULL,
+  `title` varchar(150) DEFAULT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `issued_date` date DEFAULT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL,
+  `file_path` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS property_media (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    property_id INT NOT NULL,
-    file_name VARCHAR(255) NOT NULL,
-    media_type VARCHAR(50) DEFAULT 'image',
-    sort_order INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `construction_materials`
+--
 
-CREATE TABLE IF NOT EXISTS agents (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    phone VARCHAR(30),
-    specialization VARCHAR(100),
-    commission_rate DECIMAL(5,2) DEFAULT 0.00,
-    status VARCHAR(50) DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `construction_materials`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `construction_materials` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) DEFAULT NULL,
+  `name` varchar(150) DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
+  `unit` varchar(20) DEFAULT NULL,
+  `quantity` decimal(15,2) DEFAULT 0.00,
+  `unit_cost` decimal(15,2) DEFAULT 0.00,
+  `supplier` varchar(100) DEFAULT NULL,
+  `stock_level` decimal(15,2) DEFAULT 0.00,
+  `reorder_point` decimal(15,2) DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS transactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    property_id INT,
-    agent_id INT,
-    customer_name VARCHAR(100),
-    type VARCHAR(50),
-    amount DECIMAL(15,2) DEFAULT 0.00,
-    commission DECIMAL(15,2) DEFAULT 0.00,
-    transaction_date DATE,
-    status VARCHAR(50) DEFAULT 'completed',
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `construction_projects`
+--
 
-CREATE TABLE IF NOT EXISTS invoices (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    invoice_ref VARCHAR(50) UNIQUE,
-    customer_name VARCHAR(100),
-    property_id INT,
-    amount DECIMAL(15,2) DEFAULT 0.00,
-    paid_amount DECIMAL(15,2) DEFAULT 0.00,
-    status VARCHAR(50) DEFAULT 'pending',
-    issue_date DATE,
-    due_date DATE,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `construction_projects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `construction_projects` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `property_id` int(11) DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'planning',
+  `progress` int(11) DEFAULT 0,
+  `budget` decimal(15,2) DEFAULT 0.00,
+  `spent` decimal(15,2) DEFAULT 0.00,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS payments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    invoice_id INT,
-    amount DECIMAL(15,2) DEFAULT 0.00,
-    payment_method VARCHAR(50),
-    reference VARCHAR(100),
-    payment_date DATE,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `construction_tasks`
+--
 
-CREATE TABLE IF NOT EXISTS receipts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    receipt_ref VARCHAR(50) UNIQUE,
-    payment_id INT,
-    issued_to VARCHAR(100),
-    amount DECIMAL(15,2) DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `construction_tasks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `construction_tasks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) DEFAULT NULL,
+  `title` varchar(150) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `assigned_to` int(11) DEFAULT NULL,
+  `priority` varchar(50) DEFAULT 'medium',
+  `status` varchar(50) DEFAULT 'pending',
+  `due_date` date DEFAULT NULL,
+  `completed_at` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS budgets (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    department VARCHAR(100),
-    allocated_amount DECIMAL(15,2) DEFAULT 0.00,
-    spent_amount DECIMAL(15,2) DEFAULT 0.00,
-    period_type VARCHAR(50),
-    period_label VARCHAR(100),
-    project_id INT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `contractors`
+--
 
-CREATE TABLE IF NOT EXISTS expenses (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    category_id INT,
-    description TEXT,
-    amount DECIMAL(15,2) DEFAULT 0.00,
-    scope VARCHAR(50),
-    property_id INT NULL,
-    project_id INT NULL,
-    construction_project_id INT NULL,
-    status VARCHAR(50) DEFAULT 'approved',
-    expense_date DATE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `contractors`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `contractors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `company` varchar(100) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `speciality` varchar(100) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `daily_rate` decimal(15,2) DEFAULT 0.00,
+  `rating` decimal(3,1) DEFAULT 0.0,
+  `status` varchar(50) DEFAULT 'active',
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS projects (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(150),
-    description TEXT,
-    total_investment DECIMAL(15,2) DEFAULT 0.00,
-    status VARCHAR(50) DEFAULT 'active',
-    start_date DATE,
-    end_date DATE NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `expenses`
+--
 
-CREATE TABLE IF NOT EXISTS contractors (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    type VARCHAR(50),
-    company VARCHAR(100),
-    phone VARCHAR(30),
-    email VARCHAR(100),
-    speciality VARCHAR(100),
-    project_id INT NULL,
-    daily_rate DECIMAL(15,2) DEFAULT 0.00,
-    rating DECIMAL(3,1) DEFAULT 0.0,
-    status VARCHAR(50) DEFAULT 'active',
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `expenses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `expenses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `category_id` int(11) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `amount` decimal(15,2) DEFAULT 0.00,
+  `scope` varchar(50) DEFAULT NULL,
+  `property_id` int(11) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `construction_project_id` int(11) DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'approved',
+  `expense_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS construction_projects (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(150),
-    description TEXT,
-    property_id INT NULL,
-    status VARCHAR(50) DEFAULT 'planning',
-    progress INT DEFAULT 0,
-    budget DECIMAL(15,2) DEFAULT 0.00,
-    spent DECIMAL(15,2) DEFAULT 0.00,
-    start_date DATE,
-    end_date DATE NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `invoices`
+--
 
-CREATE TABLE IF NOT EXISTS construction_tasks (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    project_id INT,
-    title VARCHAR(150),
-    description TEXT,
-    assigned_to INT NULL,
-    priority VARCHAR(50) DEFAULT 'medium',
-    status VARCHAR(50) DEFAULT 'pending',
-    due_date DATE NULL,
-    completed_at DATE NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `invoices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `invoices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_ref` varchar(50) DEFAULT NULL,
+  `customer_name` varchar(100) DEFAULT NULL,
+  `property_id` int(11) DEFAULT NULL,
+  `amount` decimal(15,2) DEFAULT 0.00,
+  `paid_amount` decimal(15,2) DEFAULT 0.00,
+  `status` varchar(50) DEFAULT 'pending',
+  `issue_date` date DEFAULT NULL,
+  `due_date` date DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `invoice_ref` (`invoice_ref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS construction_materials (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    project_id INT,
-    name VARCHAR(150),
-    category VARCHAR(50),
-    unit VARCHAR(20),
-    quantity DECIMAL(15,2) DEFAULT 0.00,
-    unit_cost DECIMAL(15,2) DEFAULT 0.00,
-    supplier VARCHAR(100),
-    stock_level DECIMAL(15,2) DEFAULT 0.00,
-    reorder_point DECIMAL(15,2) DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `messages`
+--
 
-CREATE TABLE IF NOT EXISTS construction_documents (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    project_id INT,
-    title VARCHAR(150),
-    type VARCHAR(50),
-    notes TEXT,
-    issued_date DATE NULL,
-    expiry_date DATE NULL,
-    file_name VARCHAR(255),
-    file_path VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS `messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `subject` varchar(150) DEFAULT NULL,
+  `message` text NOT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS appointments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    property_id INT NULL,
-    construction_project_id INT NULL,
-    agent_id INT NULL,
-    customer_name VARCHAR(100),
-    customer_email VARCHAR(100),
-    customer_phone VARCHAR(30),
-    type VARCHAR(50),
-    scheduled_at DATETIME,
-    notes TEXT,
-    status VARCHAR(50) DEFAULT 'Pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Table structure for table `payments`
+--
+
+DROP TABLE IF EXISTS `payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `payments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` int(11) DEFAULT NULL,
+  `amount` decimal(15,2) DEFAULT 0.00,
+  `payment_method` varchar(50) DEFAULT NULL,
+  `reference` varchar(100) DEFAULT NULL,
+  `payment_date` date DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `projects`
+--
+
+DROP TABLE IF EXISTS `projects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `projects` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `total_investment` decimal(15,2) DEFAULT 0.00,
+  `status` varchar(50) DEFAULT 'active',
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `properties`
+--
+
+DROP TABLE IF EXISTS `properties`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `properties` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `property_ref` varchar(50) DEFAULT NULL,
+  `title` varchar(150) NOT NULL,
+  `type` enum('House','Apartment','Land','Office','Commercial','Villa') NOT NULL DEFAULT 'Apartment',
+  `price` decimal(12,2) NOT NULL,
+  `location` varchar(150) NOT NULL,
+  `description` text DEFAULT NULL,
+  `bedrooms` int(11) DEFAULT 0,
+  `bathrooms` int(11) DEFAULT 0,
+  `size` decimal(10,2) DEFAULT 0.00,
+  `status` enum('For Sale','For Rent','Sold') NOT NULL DEFAULT 'For Sale',
+  `amenities` text DEFAULT NULL,
+  `image` varchar(255) DEFAULT 'no-image.jpg',
+  `image_data` longblob DEFAULT NULL,
+  `image_type` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `property_ref` (`property_ref`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `property_media`
+--
+
+DROP TABLE IF EXISTS `property_media`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `property_media` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `property_id` int(11) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `media_data` longblob DEFAULT NULL,
+  `media_mime` varchar(50) DEFAULT NULL,
+  `media_type` varchar(50) DEFAULT 'image',
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `receipts`
+--
+
+DROP TABLE IF EXISTS `receipts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `receipts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `receipt_ref` varchar(50) DEFAULT NULL,
+  `payment_id` int(11) DEFAULT NULL,
+  `issued_to` varchar(100) DEFAULT NULL,
+  `amount` decimal(15,2) DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `receipt_ref` (`receipt_ref`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `settings`
+--
+
+DROP TABLE IF EXISTS `settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `settings` (
+  `setting_key` varchar(50) NOT NULL,
+  `setting_value` text DEFAULT NULL,
+  PRIMARY KEY (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `transactions`
+--
+
+DROP TABLE IF EXISTS `transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `property_id` int(11) DEFAULT NULL,
+  `agent_id` int(11) DEFAULT NULL,
+  `customer_name` varchar(100) DEFAULT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `amount` decimal(15,2) DEFAULT 0.00,
+  `commission` decimal(15,2) DEFAULT 0.00,
+  `transaction_date` date DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'completed',
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `full_name` varchar(100) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('admin','staff','customer') NOT NULL DEFAULT 'customer',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-08-25 12:07:03
