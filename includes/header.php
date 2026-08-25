@@ -42,8 +42,7 @@ if (!isset($activePage)) { $activePage = ''; }
                     <?php endif; ?>
                     <a href="<?php echo $baseUrl ?? ''; ?>logout.php" class="btn btn-outline btn-sm">Log Out</a>
                 <?php else: ?>
-                    <a href="<?php echo $baseUrl ?? ''; ?>login.php" class="btn btn-outline btn-sm">Login</a>
-                    <a href="<?php echo $baseUrl ?? ''; ?>register.php" class="btn btn-primary btn-sm">Register</a>
+                    <a href="<?php echo $baseUrl ?? ''; ?>properties.php" class="btn btn-primary btn-sm" style="font-weight: 700; font-size: 0.9rem;">Get Started <span class="btn-arrow">&rarr;</span></a>
                 <?php endif; ?>
             </div>
         </div>
