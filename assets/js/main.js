@@ -6,10 +6,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ---- Mobile nav toggle ----
     const navToggle = document.getElementById('navToggle');
-    const navLinks = document.getElementById('navLinks');
-    if (navToggle && navLinks) {
+    const navMenu = document.getElementById('navMenu');
+    if (navToggle && navMenu) {
         navToggle.addEventListener('click', function () {
-            navLinks.classList.toggle('open');
+            navMenu.classList.toggle('open');
+            navToggle.classList.toggle('open');
+            if (navMenu.classList.contains('open')) {
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            } else {
+                document.body.style.overflow = '';
+            }
         });
     }
 
@@ -52,6 +58,47 @@ document.addEventListener('DOMContentLoaded', function () {
             searchForm.querySelectorAll('input, select').forEach(function (el) {
                 if (!el.value) el.removeAttribute('name');
             });
+        });
+    }
+
+    // ---- Animated Counters ----
+    const counters = document.querySelectorAll('.counter');
+    if (counters.length > 0) {
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    const target = +counter.getAttribute('data-target');
+                    const duration = 1000; // 1 second smooth animation
+                    const suffix = counter.getAttribute('data-suffix') || '';
+                    let startTime = null;
+
+                    const step = (timestamp) => {
+                        if (!startTime) startTime = timestamp;
+                        const progress = Math.min((timestamp - startTime) / duration, 1);
+                        const currentVal = Math.floor(progress * target);
+                        counter.innerText = currentVal + suffix;
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        } else {
+                            counter.innerText = target + suffix;
+                        }
+                    };
+
+                    window.requestAnimationFrame(step);
+                    observer.unobserve(counter); // run only once
+                }
+            });
+        }, observerOptions);
+
+        counters.forEach(counter => {
+            observer.observe(counter);
         });
     }
 });

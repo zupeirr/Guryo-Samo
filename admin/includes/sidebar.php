@@ -110,7 +110,7 @@ function navIcon(string $name): string {
         </div>
 
         <!-- Appointments -->
-        <div class="nav-group <?php echo in_array($activeAdminPage, ['appointments','calendar']) ? 'open active-group' : ''; ?>">
+        <div class="nav-group <?php echo in_array($activeAdminPage, ['appointments','viewings','site-visits','calendar']) ? 'open active-group' : ''; ?>">
             <button class="nav-group-toggle">
                 <span class="ic"><?php echo navIcon('appointments'); ?></span>
                 <span>Appointments</span>
@@ -119,7 +119,7 @@ function navIcon(string $name): string {
             <div class="nav-group-children">
                 <a href="appointments.php" class="<?php echo $activeAdminPage === 'appointments' ? 'active' : ''; ?>">All Appointments</a>
                 <a href="appointments.php?type=Viewing" class="<?php echo $activeAdminPage === 'viewings' ? 'active' : ''; ?>">Property Viewings</a>
-                <a href="appointments.php?type=Site+Visit">Site Visits</a>
+                <a href="appointments.php?type=Site+Visit" class="<?php echo $activeAdminPage === 'site-visits' ? 'active' : ''; ?>">Site Visits</a>
                 <a href="calendar.php" class="<?php echo $activeAdminPage === 'calendar' ? 'active' : ''; ?>">Calendar</a>
             </div>
         </div>
