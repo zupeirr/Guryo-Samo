@@ -58,27 +58,27 @@ $priorityColors = [
 <!-- ── KPI Strip ─────────────────────────────────────────────────────────── -->
 <div class="dash-stats" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); margin-bottom:1.5rem;">
     <div class="dash-card">
-        <div class="ic-wrap blue">🏗️</div>
+        <div class="ic-wrap navy"><i data-lucide="building-2"></i></div>
         <div><h3><?php echo $totalProjects; ?></h3><span>Total Projects</span></div>
     </div>
     <div class="dash-card">
-        <div class="ic-wrap green">▶️</div>
+        <div class="ic-wrap green"><i data-lucide="activity"></i></div>
         <div><h3><?php echo $activeProjects; ?></h3><span>Active</span></div>
     </div>
     <div class="dash-card">
-        <div class="ic-wrap <?php echo $urgentTasks > 0 ? 'red' : 'blue'; ?>">📋</div>
+        <div class="ic-wrap <?php echo $urgentTasks > 0 ? 'red' : 'navy'; ?>"><i data-lucide="clipboard-list"></i></div>
         <div><h3><?php echo $openTasks; ?></h3><span>Open Tasks <?php if($urgentTasks): ?><span style="color:#dc2626; font-size:0.72rem;">(<?php echo $urgentTasks; ?> urgent)</span><?php endif; ?></span></div>
     </div>
     <div class="dash-card">
-        <div class="ic-wrap blue">👷</div>
+        <div class="ic-wrap navy"><i data-lucide="hard-hat"></i></div>
         <div><h3><?php echo $totalContractors; ?></h3><span>Active Contractors</span></div>
     </div>
     <div class="dash-card">
-        <div class="ic-wrap <?php echo $lowStock > 0 ? 'red' : 'green'; ?>">🧱</div>
+        <div class="ic-wrap <?php echo $lowStock > 0 ? 'red' : 'green'; ?>"><i data-lucide="brick-wall"></i></div>
         <div><h3><?php echo $totalMaterials; ?></h3><span>Materials <?php if($lowStock): ?><span style="color:#dc2626; font-size:0.72rem;">(<?php echo $lowStock; ?> low)</span><?php endif; ?></span></div>
     </div>
     <div class="dash-card">
-        <div class="ic-wrap <?php echo $expiringDocs > 0 ? 'red' : 'blue'; ?>">📄</div>
+        <div class="ic-wrap <?php echo $expiringDocs > 0 ? 'red' : 'navy'; ?>"><i data-lucide="file-text"></i></div>
         <div><h3><?php echo $totalDocuments; ?></h3><span>Documents <?php if($expiringDocs): ?><span style="color:#dc2626; font-size:0.72rem;">(<?php echo $expiringDocs; ?> expiring)</span><?php endif; ?></span></div>
     </div>
 </div>
