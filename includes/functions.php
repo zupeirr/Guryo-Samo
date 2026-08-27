@@ -9,7 +9,7 @@ function requireLogin() { if (!isAdminLoggedIn()) redirect('../login.php'); }
 function csrfToken() { if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); return $_SESSION['csrf_token']; }
 function verifyCsrf($t) { return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $t ?? ''); }
 function uploadPropertyImage($fn, $dir) {
-    if (!isset($_FILES[$fn]) || $_FILES[$fn]['error'] === UPLOAD_ERR_NO_FILE) return 'no-image.jpg';
+    if (!isset($_FILES[$fn]) || $_FILES[$fn]['error'] === UPLOAD_ERR_NO_FILE) return ['name'=>'no-image.jpg', 'data'=>null, 'mime'=>null];
     $f = $_FILES[$fn];
     if ($f['error'] !== UPLOAD_ERR_OK) return ['error' => 'Upload failed.'];
     $fi = finfo_open(FILEINFO_MIME_TYPE); $m = finfo_file($fi, $f['tmp_name']); finfo_close($fi);
@@ -17,8 +17,8 @@ function uploadPropertyImage($fn, $dir) {
     if ($f['size'] > 5*1024*1024) return ['error' => 'Image too large (max 5MB).'];
     $ext = preg_replace('/[^a-z0-9]/', '', strtolower(pathinfo($f['name'], PATHINFO_EXTENSION)));
     $n = 'property_'.time().'_'.bin2hex(random_bytes(4)).'.'.$ext;
-    if (!move_uploaded_file($f['tmp_name'], rtrim($dir,'/').'/'.$n)) return ['error' => 'Could not save image.'];
-    return $n;
+    $data = file_get_contents($f['tmp_name']);
+    return ['name' => $n, 'data' => $data, 'mime' => $m];
 }
 function uploadPropertyImages($fn, $dir) {
     if (!isset($_FILES[$fn]) || empty($_FILES[$fn]['name'][0])) return [];
@@ -31,13 +31,13 @@ function uploadPropertyImages($fn, $dir) {
         if ($fs['size'][$i]>5*1024*1024) return ['error'=>'Image too large.'];
         $ext=preg_replace('/[^a-z0-9]/','',strtolower(pathinfo($fs['name'][$i],PATHINFO_EXTENSION)));
         $n='property_'.time().mt_rand(100,999).'_'.bin2hex(random_bytes(4)).'.'.$ext;
-        if (!move_uploaded_file($fs['tmp_name'][$i],rtrim($dir,'/').'/'.$n)) return ['error'=>'Could not save image.'];
-        $s[]=$n;
+        $data = file_get_contents($fs['tmp_name'][$i]);
+        $s[]=['name'=>$n, 'data'=>$data, 'mime'=>$m];
     }
     return $s;
 }
 function uploadPropertyVideo($fn, $dir) {
-    if (!isset($_FILES[$fn]) || $_FILES[$fn]['error'] === UPLOAD_ERR_NO_FILE) return '';
+    if (!isset($_FILES[$fn]) || $_FILES[$fn]['error'] === UPLOAD_ERR_NO_FILE) return null;
     $f=$_FILES[$fn]; $al=['video/mp4','video/webm','video/ogg','video/quicktime'];
     if ($f['error'] !== UPLOAD_ERR_OK) return ['error'=>'Video upload failed.'];
     $fi=finfo_open(FILEINFO_MIME_TYPE); $m=finfo_file($fi,$f['tmp_name']); finfo_close($fi);
@@ -45,12 +45,18 @@ function uploadPropertyVideo($fn, $dir) {
     if ($f['size']>100*1024*1024) return ['error'=>'Video must be under 100MB.'];
     $ext=preg_replace('/[^a-z0-9]/','',strtolower(pathinfo($f['name'],PATHINFO_EXTENSION)));
     $n='video_'.time().'_'.bin2hex(random_bytes(4)).'.'.$ext;
-    if (!move_uploaded_file($f['tmp_name'],rtrim($dir,'/').'/'.$n)) return ['error'=>'Could not save video.'];
-    return $n;
+    $data = file_get_contents($f['tmp_name']);
+    return ['name' => $n, 'data' => $data, 'mime' => $m];
 }
 function savePropertyMedia($conn, $pid, $files, $type='image') {
-    $s=$conn->prepare('INSERT INTO property_media (property_id, file_name, media_type, sort_order) VALUES (?,?,?,?)');
-    foreach ($files as $i=>$name) { $s->bind_param('issi',$pid,$name,$type,$i); $s->execute(); }
+    $s=$conn->prepare('INSERT INTO property_media (property_id, file_name, media_data, media_mime, media_type, sort_order) VALUES (?,?,?,?,?,?)');
+    foreach ($files as $i=>$f) { 
+        $n = is_array($f) ? $f['name'] : $f;
+        $d = is_array($f) ? $f['data'] : null;
+        $m = is_array($f) ? $f['mime'] : null;
+        $s->bind_param('issssi',$pid,$n,$d,$m,$type,$i); 
+        $s->execute(); 
+    }
 }
 function paginate(int $total, int $perPage=20):array {
     $cur=max(1,(int)($_GET['page']??1)); $tp=max(1,(int)ceil($total/$perPage)); $cur=min($cur,$tp);
@@ -69,4 +75,36 @@ function getSetting($conn,$key,$default='') {
     $s=$conn->prepare('SELECT setting_value FROM settings WHERE setting_key=?');
     if ($s) { $s->bind_param('s',$key); $s->execute(); $r=$s->get_result(); if ($r&&$r->num_rows>0) { $row=$r->fetch_assoc(); return $row['setting_value']!==null?$row['setting_value']:$default; } }
     return $default;
+}
+
+/**
+ * rateLimit()
+ * Simple session-based rate limiter to prevent form spam/flooding.
+ *
+ * Usage: if (!rateLimit('contact_form', 3, 60)) { die('Too many requests.'); }
+ *
+ * @param string $key      Unique identifier for the action (e.g. 'contact_form')
+ * @param int    $maxHits  Maximum allowed submissions within the window
+ * @param int    $window   Time window in seconds (default: 60s)
+ * @return bool  true = allowed, false = rate limit exceeded
+ */
+function rateLimit(string $key, int $maxHits = 3, int $window = 60): bool {
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    $now = time();
+    $sessionKey = '__rl_' . $key;
+
+    if (!isset($_SESSION[$sessionKey])) {
+        $_SESSION[$sessionKey] = ['count' => 0, 'start' => $now];
+    }
+
+    $data = &$_SESSION[$sessionKey];
+
+    // Reset window if expired
+    if ($now - $data['start'] > $window) {
+        $data = ['count' => 0, 'start' => $now];
+    }
+
+    $data['count']++;
+
+    return $data['count'] <= $maxHits;
 }
