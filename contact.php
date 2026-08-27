@@ -14,20 +14,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrf($_POST['csrf_token'] ?? '')) {
         $errorMsg = 'Your session has expired. Please try submitting the form again.';
     } else {
-        $name    = trim($_POST['name'] ?? '');
-        $email   = trim($_POST['email'] ?? '');
-        $phone   = trim($_POST['phone'] ?? '');
-        $subject = trim($_POST['subject'] ?? '');
-        $message = trim($_POST['message'] ?? '');
+        $name       = trim($_POST['name'] ?? '');
+        $email      = trim($_POST['email'] ?? '');
+        $phone      = trim($_POST['phone'] ?? '');
+        $subject    = trim($_POST['subject'] ?? '');
+        $message    = trim($_POST['message'] ?? '');
+        $property_id = isset($_POST['property_id']) && (int)$_POST['property_id'] > 0 ? (int)$_POST['property_id'] : null;
+        $redirect_to = trim($_POST['redirect_to'] ?? '');
 
         if ($name === '' || $email === '' || $message === '') {
             $errorMsg = 'Please fill in your name, email, and message.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errorMsg = 'Please enter a valid email address.';
         } else {
-            $stmt = $conn->prepare("INSERT INTO messages (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param('sssss', $name, $email, $phone, $subject, $message);
+            $stmt = $conn->prepare("INSERT INTO messages (property_id, name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param('isssss', $property_id, $name, $email, $phone, $subject, $message);
             if ($stmt->execute()) {
+                // Redirect to a property page if a redirect_to param was set
+                if ($redirect_to && preg_match('/^[a-zA-Z0-9\-_.?&=]+$/', $redirect_to)) {
+                    header('Location: ' . $redirect_to);
+                    exit;
+                }
                 $successMsg = 'Thank you! Your message has been sent. Our team will get back to you soon.';
                 
                 // Send email notification if enabled
@@ -180,14 +187,14 @@ include 'includes/header.php';
                     <p style="text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-top: 12px;">We usually respond within one business day.</p>
                 </form>
 
-                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border);">
-                    <h4 style="font-size: 1.05rem; margin-bottom: 16px;">Prefer a quick conversation?</h4>
-                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                        <a href="https://wa.me/252636097266" target="_blank" class="btn" style="background:#25D366; color:#fff;">
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border); text-align: center;">
+                    <h4 style="font-size: 1.05rem; margin-bottom: 16px; color: var(--navy-900);">Prefer a quick conversation?</h4>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                        <a href="https://wa.me/252636097266" target="_blank" class="btn" style="background:#25D366; color:#fff; display:inline-flex; align-items:center; gap:8px;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                             WhatsApp Us
                         </a>
-                        <a href="tel:+252636097266" class="btn btn-ghost">
+                        <a href="tel:+252636097266" class="btn btn-ghost" style="display:inline-flex; align-items:center; gap:8px;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                             Call Us
                         </a>
