@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guryo Samo — Real Estate Management System</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ededed;
+            --accent-color: #ffffff;
+            --secondary-bg: #0a0a0a;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --highlight: #0070f3;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            letter-spacing: -0.02em;
+        }
+
+        /* Animated Background Blobs */
+        .animated-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: 0; pointer-events: none;
+        }
+        .blob {
+            position: absolute;
+            filter: blur(100px);
+            opacity: 0.5;
+            border-radius: 50%;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(0, 112, 243, 0.4); }
+        .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: rgba(121, 40, 202, 0.4); animation-delay: -5s; }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.1); }
+        }
+
+        /* Presentation Container */
+        .presentation-container {
+            width: 95vw;
+            height: 90vh;
+            max-width: 1400px;
+            position: relative;
+            background: var(--secondary-bg);
+            border-radius: 24px;
+            box-shadow: 0 0 0 1px var(--border-color), 0 30px 60px rgba(0,0,0,0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+            backdrop-filter: blur(20px);
+        }
+
+        /* Fullscreen mode adjustment */
+        body.is-fullscreen .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            border-radius: 0;
+            border: none;
+        }
+
+        /* Slide Content Area */
+        .slides-wrapper {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 5rem 6rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.97) translateY(20px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+            z-index: 10;
+        }
+
+        /* Slide Typography & Elements */
+        h1, h2, h3 {
+            color: var(--accent-color);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        h1 {
+            font-size: 5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #e4e4e7;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            color: #a1a1aa;
+        }
+
+        ul, ol {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            padding-left: 2.5rem;
+            color: #a1a1aa;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+        }
+
+        strong {
+            color: #f4f4f5;
+        }
+
+        blockquote {
+            border-left: 2px solid var(--highlight);
+            padding-left: 1.5rem;
+            font-style: italic;
+            color: #a1a1aa;
+            margin: 2rem 0;
+            background: transparent;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 2rem 0;
+            font-size: 1.1rem;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        th, td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        th {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer & Controls */
+        .presentation-footer {
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .footer-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            color: #71717a;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        
+        .slide-counter {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button.nav-btn {
+            background: transparent;
+            border: none;
+            color: #71717a;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button.nav-btn:hover {
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: transparent;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--highlight);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--highlight);
+        }
+        
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide.active > * {
+            opacity: 0;
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .slide.active h2 { animation-delay: 0.1s; }
+        .slide.active p, .slide.active ul { animation-delay: 0.2s; }
+        .slide.active .grid-2, .slide.active table, .slide.active .card { animation-delay: 0.3s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide { padding: 3rem 2rem; }
+            h1 { font-size: 3rem; }
+            h2 { font-size: 2rem; }
+            p, ul { font-size: 1.1rem; }
+            .grid-2 { grid-template-columns: 1fr; gap: 1.5rem; }
+            .footer-text { display: none; }
+        }
+        
+        /* Scrollbar styling */
+        .slide::-webkit-scrollbar {
+            width: 6px;
+        }
+        .slide::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .slide::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="animated-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+</div>
+
+<div class="presentation-container" id="presentation">
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="slides-wrapper">
+        <!-- Slide 1: Title -->
+        <div class="slide title-slide active" style="display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center;">
+            <div style="text-transform: uppercase; letter-spacing: 0.15em; color: #a1a1aa; font-size: 0.85rem; font-weight: 600; margin-bottom: 2rem;">
+                Dire Dawa University &nbsp;&bull;&nbsp; Department of Software Engineering
+            </div>
+            
+            <h1 style="margin-bottom: 2rem;">Guryo Samo</h1>
+            
+            <div style="display: flex; gap: 2rem; margin-bottom: 4rem; text-align: left; justify-content: center; width: 100%;">
+                <div class="card" style="padding: 1.5rem 2rem; min-width: 200px;">
+                    <div style="font-size: 0.75rem; color: #71717a; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.1em;">Presented By</div>
+                    <div style="font-size: 1.2rem; font-weight: 500; color: #fff;">Suber Sulub</div>
+                </div>
+                <div class="card" style="padding: 1.5rem 2rem; min-width: 200px;">
+                    <div style="font-size: 0.75rem; color: #71717a; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.1em;">Organization</div>
+                    <div style="font-size: 1.2rem; font-weight: 500; color: #fff;">Afronex Tech Hub</div>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('nextBtn').click()" style="background: #fff; color: #000; font-weight: 600; padding: 1rem 2.5rem; border-radius: 30px; font-size: 1rem; border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 30px rgba(255,255,255,0.15); display: inline-flex; align-items: center; justify-content: center;">
+                Start Presentation &nbsp;&rarr;
+            </button>
+        </div>
+
+        <!-- Slide 2: Table of Contents -->
+        <div class="slide">
+            <h2>Table of Contents</h2>
+            <div class="grid-2">
+                <ol style="color: #a1a1aa; font-size: 1.2rem; line-height: 2;">
+                    <li>Introduction</li>
+                    <li>Problem Statement</li>
+                    <li>Project Objectives
+                        <ul style="font-size: 1rem; color: #71717a;">
+                            <li>3.1 General Objective</li>
+                            <li>3.2 Specific Objectives</li>
+                        </ul>
+                    </li>
+                    <li>Scope and Limitations
+                        <ul style="font-size: 1rem; color: #71717a;">
+                            <li>4.1 Scope</li>
+                            <li>4.2 Limitations</li>
+                        </ul>
+                    </li>
+                    <li>System Specifications
+                        <ul style="font-size: 1rem; color: #71717a;">
+                            <li>5.1 Functional Requirements</li>
+                            <li>5.2 Non-Functional Requirements</li>
+                            <li>5.3 Hardware Requirements</li>
+                            <li>5.4 Software Requirements</li>
+                        </ul>
+                    </li>
+                </ol>
+                <ol start="6" style="color: #a1a1aa; font-size: 1.2rem; line-height: 2;">
+                    <li>Project Feasibility
+                        <ul style="font-size: 1rem; color: #71717a;">
+                            <li>6.1 Technical Feasibility</li>
+                            <li>6.2 Economic Feasibility</li>
+                            <li>6.3 Operational Feasibility</li>
+                            <li>6.4 Schedule Feasibility</li>
+                        </ul>
+                    </li>
+                    <li>Methodology</li>
+                    <li>Results and Outcomes</li>
+                    <li>Conclusion and Recommendation</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Slide 3: Introduction -->
+        <div class="slide">
+            <h2>1. Introduction</h2>
+            <div class="grid-2">
+                <div>
+                    <p>The rapid expansion of urban areas in Somaliland has created a pressing need for modern digital solutions in the real estate sector.</p>
+                    <p>Current operational practices remain manual and fragmented:</p>
+                    <ul>
+                        <li>Informal communication channels (WhatsApp, phone calls)</li>
+                        <li>Paper-based records and filing</li>
+                        <li>Unstructured digital tools (social media, messaging apps)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>The Solution</h3>
+                    <p><strong>Guryo Samo</strong> — meaning &ldquo;Your Home&rdquo; in Somali — connects property seekers with available listings in a transparent, organized digital environment.</p>
+                    <ul>
+                        <li>Public-facing property portal with advanced search</li>
+                        <li>Secured, role-based administrative control panel</li>
+                        <li>100% open-source: PHP, MySQL, HTML5, CSS3, JS</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Problem Statement -->
+        <div class="slide">
+            <h2>2. Problem Statement</h2>
+            <p>Despite significant growth in Somaliland&rsquo;s real estate sector, agencies lack effective digital tools for management and client communication.</p>
+            <ul>
+                <li><strong>Inefficient Operations:</strong> Manual methods are difficult to scale and prone to information loss.</li>
+                <li><strong>Fragmented Search Experience:</strong> Seekers have no centralized, localized platform to find relevant listings.</li>
+                <li><strong>Cost-Prohibitive Alternatives:</strong> Commercial platforms like Zillow and Bayut are not localized for Somaliland and carry high recurring subscription costs.</li>
+                <li><strong>No Analytics:</strong> Agencies cannot generate meaningful reports from scattered, paper-based records.</li>
+            </ul>
+            <div class="card" style="margin-top: 1.5rem;">
+                <strong>Core Goal:</strong> Provide a locally developed, cost-effective digital environment for property managers and prospective clients — deployable on any standard web hosting.
+            </div>
+        </div>
+
+        <!-- Slide 5: Project Objectives -->
+        <div class="slide">
+            <h2>3. Project Objectives</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>3.1 General Objective</h3>
+                    <p>To design and develop a fully functional, web-based Real Estate Management System enabling local businesses to manage property listings, communicate with clients, and provide the public an accessible digital property portal.</p>
+                </div>
+                <div>
+                    <h3>3.2 Specific Objectives</h3>
+                    <ul>
+                        <li>Design a normalized relational database schema.</li>
+                        <li>Develop a public-facing portal with advanced filtering.</li>
+                        <li>Build a secure, role-based administrative dashboard.</li>
+                        <li>Implement bcrypt authentication &amp; session management.</li>
+                        <li>Integrate a contact &amp; messaging module.</li>
+                        <li>Enforce SQLi, XSS, and CSRF defenses throughout.</li>
+                        <li>Deliver an analytics and reporting module.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Scope and Limitations -->
+        <div class="slide">
+            <h2>4. Scope and Limitations</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>4.1 Scope</h3>
+                    <ul>
+                        <li><strong>Public Portal:</strong> Property listings, search/filter, property detail pages, user registration &amp; unified login.</li>
+                        <li><strong>Admin Panel:</strong> Dashboard stats, full CRUD for properties, message management, user control, analytics &amp; site settings.</li>
+                        <li><strong>Security Layer:</strong> Prepared statements, output escaping, CSRF tokens, MIME upload validation, bcrypt passwords.</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-color: rgba(239,68,68,0.3);">
+                    <h3 style="color: #fca5a5;">4.2 Limitations</h3>
+                    <ul>
+                        <li>No dedicated customer-facing dashboard or saved searches.</li>
+                        <li>Only one primary image upload per property listing.</li>
+                        <li>No login rate limiting or brute-force lockout.</li>
+                        <li>Database credentials stored in <code>config/db.php</code> (not env vars).</li>
+                        <li>No property-specific inquiry form.</li>
+                        <li>No advanced sorting on the listings page.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: System Interface Overview -->
+        <div class="slide">
+            <h2>System Interface Overview</h2>
+            <div style="display: flex; gap: 1.5rem; height: calc(100% - 8rem); align-items: center;">
+                <div style="flex: 1; text-align: center;">
+                    <p style="font-size: 0.9rem; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Public Portal</p>
+                    <img src="assets/images/homepage.png" alt="Homepage" style="width: 100%; border-radius: 10px; border: 1px solid var(--glass-border);">
+                </div>
+                <div style="flex: 1; text-align: center;">
+                    <p style="font-size: 0.9rem; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Admin Dashboard</p>
+                    <img src="assets/images/dashboard.png" alt="Admin Dashboard" style="width: 100%; border-radius: 10px; border: 1px solid var(--glass-border);">
+                </div>
+                <div style="flex: 1; text-align: center;">
+                    <p style="font-size: 0.9rem; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Secure Login</p>
+                    <img src="assets/images/login.png" alt="Login" style="width: 100%; border-radius: 10px; border: 1px solid var(--glass-border);">
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Functional & Non-Functional Requirements -->
+        <div class="slide">
+            <h2>5.1 &amp; 5.2 — Functional &amp; Non-Functional Requirements</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>5.1 Functional Requirements (Key)</h3>
+                    <ul>
+                        <li>Public browsing of listings without authentication (FR-01).</li>
+                        <li>Filter by location, type, status &amp; max price (FR-02).</li>
+                        <li>Paginated results with configurable page size (FR-03).</li>
+                        <li>Role-based redirection upon login (FR-08).</li>
+                        <li>Admin CRUD for property listings with image upload (FR-10 to FR-12).</li>
+                        <li>Analytics &amp; reporting dashboard (FR-15).</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>5.2 Non-Functional Requirements</h3>
+                    <ul>
+                        <li><strong>Security:</strong> Prepared statements, HTML escaping, CSRF tokens, bcrypt hashing, MIME validation.</li>
+                        <li><strong>Usability:</strong> Responsive design, informative form feedback.</li>
+                        <li><strong>Performance:</strong> SQL <code>LIMIT/OFFSET</code> pagination.</li>
+                        <li><strong>Reliability:</strong> Graceful error handling for invalid IDs.</li>
+                        <li><strong>Compatibility:</strong> PHP 7.4+, MySQL 5.7+.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Hardware & Software Requirements -->
+        <div class="slide">
+            <h2>5.3 &amp; 5.4 — Hardware &amp; Software Requirements</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>5.3 Hardware Requirements</h3>
+                    <table>
+                        <thead><tr><th>Component</th><th>Minimum</th></tr></thead>
+                        <tbody>
+                            <tr><td>Processor</td><td>Dual-core 1.5 GHz</td></tr>
+                            <tr><td>RAM</td><td>2 GB</td></tr>
+                            <tr><td>Storage</td><td>500 MB + uploads space</td></tr>
+                            <tr><td>Display</td><td>1024 &times; 768 (client)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3>5.4 Software Requirements</h3>
+                    <table>
+                        <thead><tr><th>Software</th><th>Version</th></tr></thead>
+                        <tbody>
+                            <tr><td>PHP</td><td>7.4+</td></tr>
+                            <tr><td>MySQL</td><td>5.7+ (InnoDB)</td></tr>
+                            <tr><td>Apache</td><td>2.4+ (via XAMPP)</td></tr>
+                            <tr><td>PHPMailer</td><td>6.x</td></tr>
+                            <tr><td>Browser</td><td>Chrome 90+, Firefox 88+</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Project Feasibility -->
+        <div class="slide">
+            <h2>6. Project Feasibility</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>6.1 Technical &amp; 6.2 Economic</h3>
+                    <ul>
+                        <li><strong>Technical — High:</strong> SSR architecture eliminates complex state management. Standard LAMP/XAMPP stack, well-documented and widely supported.</li>
+                        <li><strong>Economic — High:</strong> 100% open-source, zero licensing cost. Deployable on shared hosting for ~$3–$10/month with no per-listing fees.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>6.3 Operational &amp; 6.4 Schedule</h3>
+                    <ul>
+                        <li><strong>Operational — High:</strong> Follows standard CMS and property portal UI patterns. Near-zero learning curve for both admins and public users.</li>
+                        <li><strong>Schedule — Achieved:</strong> Built using Agile incremental methodology. All 6 phases completed within an 8–12 week academic semester.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Methodology -->
+        <div class="slide">
+            <h2>7. Methodology</h2>
+            <p>Developed using an <strong>incremental and iterative Agile approach</strong>, allowing continuous refinement and early detection of design issues.</p>
+            <div class="grid-2">
+                <ul>
+                    <li><strong>Phase 1:</strong> Requirements Elicitation &amp; Analysis — user roles, database schema, functional decomposition.</li>
+                    <li><strong>Phase 2:</strong> Database Design — relational model, SQL schema, seed data.</li>
+                    <li><strong>Phase 3:</strong> Backend Architecture — <code>config/db.php</code>, <code>includes/functions.php</code>, shared utilities.</li>
+                    <li><strong>Phase 4:</strong> Frontend &amp; Backend Page Development — public and admin pages built concurrently.</li>
+                </ul>
+                <ul>
+                    <li><strong>Phase 5:</strong> Security Integration — CSRF, SQLi, XSS, MIME validation applied throughout.</li>
+                    <li><strong>Phase 6:</strong> Testing &amp; Debugging — manual happy-path and edge-case testing across all modules.</li>
+                    <li><strong>Phase 7:</strong> Documentation — comprehensive project guide, README, and academic defense material.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 12: Results and Outcomes -->
+        <div class="slide">
+            <h2>8. Results and Outcomes</h2>
+            <p>All seven specific objectives were fully met. The system is functional, demonstrable, and ready for local deployment.</p>
+            <div class="grid-2">
+                <div>
+                    <h3>Delivered Modules</h3>
+                    <ul>
+                        <li>&#10003; Responsive Public Portal &amp; Dynamic Search</li>
+                        <li>&#10003; Role-Based Admin Dashboard</li>
+                        <li>&#10003; Property CRUD with Image Uploads</li>
+                        <li>&#10003; User &amp; Message Management</li>
+                        <li>&#10003; Analytics &amp; Site Settings Panel</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-color: rgba(52,211,153,0.3);">
+                    <h3 style="color: #34d399;">Security Outcomes</h3>
+                    <ul>
+                        <li>SQL Injection &rarr; Parameterized queries</li>
+                        <li>XSS &rarr; <code>htmlspecialchars()</code> output escaping</li>
+                        <li>CSRF &rarr; Cryptographic token on every POST</li>
+                        <li>Session Fixation &rarr; <code>session_regenerate_id()</code></li>
+                        <li>Password Exposure &rarr; bcrypt hashing only</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Conclusion and Recommendation -->
+        <div class="slide">
+            <h2>9. Conclusion &amp; Recommendation</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>Conclusion</h3>
+                    <p>Guryo Samo successfully bridges the digital gap in Somaliland&rsquo;s real estate sector. It delivers a centralized, secure, and cost-effective platform covering the full project lifecycle — from requirements and design to implementation, testing, and documentation.</p>
+                    <p>The project demonstrates competency in full-stack web development, relational database design, and practical web application security.</p>
+                </div>
+                <div class="card">
+                    <h3>Recommendations</h3>
+                    <ul>
+                        <li>Implement <strong>login rate limiting</strong> before production.</li>
+                        <li>Migrate credentials to <strong>environment variables</strong> (.env).</li>
+                        <li>Enforce <strong>HTTPS</strong> via Apache .htaccess redirect.</li>
+                        <li>Build a <strong>customer dashboard</strong> with saved favorites.</li>
+                        <li>Add <strong>multi-image galleries</strong> per property listing.</li>
+                        <li>Consider adopting a <strong>lightweight MVC framework</strong> (Laravel/Slim) for long-term scalability.</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border); color: #71717a; font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase;">
+                Thank You &mdash; Suber Sulub &bull; Afronex Tech Hub &bull; Dire Dawa University
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Presentation Footer Controls -->
+    <div class="presentation-footer">
+        <div class="footer-info">
+            <span class="slide-counter"><span id="currentSlideNum">1</span> / <span id="totalSlidesNum">12</span></span>
+            <span class="footer-text">Guryo Samo — Real Estate Management System</span>
+        </div>
+        <div class="controls">
+            <button class="nav-btn" id="fullscreenBtn" title="Toggle Fullscreen (F)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+            </button>
+            <button class="nav-btn" id="prevBtn" title="Previous Slide (Left Arrow)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="nav-btn" id="nextBtn" title="Next Slide (Right Arrow / Space)">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+        
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentSlideNum = document.getElementById('currentSlideNum');
+        const totalSlidesNum = document.getElementById('totalSlidesNum');
+        const progressBar = document.getElementById('progressBar');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        totalSlidesNum.textContent = totalSlides;
+        
+        function updateSlides() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            
+            currentSlideNum.textContent = currentSlide + 1;
+            
+            // Update Progress Bar
+            const progress = ((currentSlide) / (totalSlides - 1)) * 100;
+            progressBar.style.width = progress + '%';
+            
+            // Update Buttons State
+            prevBtn.disabled = currentSlide === 0;
+            prevBtn.style.opacity = currentSlide === 0 ? '0.5' : '1';
+            prevBtn.style.cursor = currentSlide === 0 ? 'not-allowed' : 'pointer';
+            
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+            nextBtn.style.opacity = currentSlide === totalSlides - 1 ? '0.5' : '1';
+            nextBtn.style.cursor = currentSlide === totalSlides - 1 ? 'not-allowed' : 'pointer';
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+                document.body.classList.add('is-fullscreen');
+            } else {
+                document.exitFullscreen();
+                document.body.classList.remove('is-fullscreen');
+            }
+        }
+        
+        // Event Listeners
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        
+        // Listen for fullscreen change event to update class
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('is-fullscreen');
+            }
+        });
+        
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+        
+        // Initial setup
+        updateSlides();
+    });
+</script>
+</body>
+</html>
