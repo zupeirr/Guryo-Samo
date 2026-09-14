@@ -38,8 +38,8 @@ $payments = $stmt->get_result();
 include 'includes/admin-header.php';
 ?>
 <div class="dash-stats" style="margin-bottom:1.5rem;">
-    <div class="dash-card"><div class="ic-wrap green">💳</div><div><h3><?php echo formatPrice($totals['total_amt'] ?? 0); ?></h3><span>Filtered Payments</span></div></div>
-    <div class="dash-card"><div class="ic-wrap navy">📋</div><div><h3><?php echo (int)$totalRows; ?></h3><span>Total Records</span></div></div>
+    <div class="dash-card"><div class="ic-wrap green"><i data-lucide="credit-card" style="width:20px;height:20px;"></i></div><div><h3><?php echo formatPrice($totals['total_amt'] ?? 0); ?></h3><span>Filtered Payments</span></div></div>
+    <div class="dash-card"><div class="ic-wrap navy"><i data-lucide="clipboard-list" style="width:20px;height:20px;"></i></div><div><h3><?php echo (int)$totalRows; ?></h3><span>Total Records</span></div></div>
 </div>
 
 <div class="panel">

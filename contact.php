@@ -105,12 +105,48 @@ include 'includes/header.php';
     </div>
 </section>
 
-<section class="section">
+<section class="section contact-section">
     <div class="container">
         <div class="contact-grid">
             <div>
-                <span class="eyebrow">Get In Touch</span>
-                <h2 class="section-title">Contact Information</h2>
+                <span class="eyebrow" style="color: var(--gold-600); letter-spacing: 0.1em; font-weight: 700; display: block; margin-bottom: 8px;">LET'S BUILD SOMETHING GREAT</span>
+                <h2 class="section-title" style="margin-bottom: 24px; color: var(--navy-900);">Find Your Next Property</h2>
+                
+                <p style="margin-bottom: 32px; color: var(--ink-soft); font-size: 1.05rem; line-height: 1.6; max-width: 90%;">
+                    Whether you're looking for land, a home, or a construction project, our team is ready to help.
+                </p>
+
+                <div class="service-cards" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px;">
+                    <div style="background: #fff; border: 1px solid #eae5d9; border-radius: 12px; padding: 16px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                        <div style="background: var(--navy-900); color: var(--gold-500); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: var(--navy-900); font-size: 1rem; font-weight: 600;">Property Inquiries</h4>
+                            <p style="margin: 0; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.4;">Find available homes, land & properties.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #fff; border: 1px solid #eae5d9; border-radius: 12px; padding: 16px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                        <div style="background: var(--navy-900); color: var(--gold-500); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"></circle><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: var(--navy-900); font-size: 1rem; font-weight: 600;">Site Visits</h4>
+                            <p style="margin: 0; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.4;">Schedule a visit to your preferred property.</p>
+                        </div>
+                    </div>
+
+                    <div style="background: #fff; border: 1px solid #eae5d9; border-radius: 12px; padding: 16px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                        <div style="background: var(--navy-900); color: var(--gold-500); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"></path><path d="M5 20V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 16v4"></path><path d="M15 16v4"></path></svg>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: var(--navy-900); font-size: 1rem; font-weight: 600;">Construction Services</h4>
+                            <p style="margin: 0; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.4;">Discuss your building or development project.</p>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="contact-info-item">
                     <div class="icon-box" style="color:var(--gold-600);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
@@ -143,7 +179,10 @@ include 'includes/header.php';
             </div>
 
             <div class="contact-form">
-                <h3 style="margin-bottom:18px;">Send Us a Message</h3>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+                    <div style="width: 24px; height: 2px; background: var(--gold-500);"></div>
+                    <h3 style="margin-bottom: 0; color: var(--navy-900);">Send Us a Message</h3>
+                </div>
 
                 <?php if ($successMsg): ?><div class="alert alert-success"><?php echo clean($successMsg); ?></div><?php endif; ?>
                 <?php if ($errorMsg): ?><div class="alert alert-error"><?php echo clean($errorMsg); ?></div><?php endif; ?>
@@ -166,15 +205,15 @@ include 'includes/header.php';
                             <div class="field"><input type="text" id="phone" name="phone" placeholder="+252 63 1234567"></div>
                         </div>
                         <div class="field-block">
-                            <label for="subject" style="font-size:0.84rem; font-weight:600; display:block; margin-bottom:6px;">How can we help?</label>
+                            <label for="subject" style="font-size:0.84rem; font-weight:600; display:block; margin-bottom:6px;">I'm interested in...</label>
                             <div class="field">
                                 <select id="subject" name="subject" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter', sans-serif;">
                                     <option value="" disabled selected>Select an option...</option>
-                                    <option value="I'm looking to buy">I'm looking to buy</option>
-                                    <option value="I'm looking to rent">I'm looking to rent</option>
-                                    <option value="I want to sell a property">I want to sell a property</option>
-                                    <option value="I want to list a property">I want to list a property</option>
-                                    <option value="General inquiry">General inquiry</option>
+                                    <option value="Buying a Property">🏠 Buying a Property</option>
+                                    <option value="Land / Plot">🌍 Land / Plot</option>
+                                    <option value="Construction Services">🏗️ Construction Services</option>
+                                    <option value="Schedule a Site Visit">📍 Schedule a Site Visit</option>
+                                    <option value="General Inquiry">💬 General Inquiry</option>
                                 </select>
                             </div>
                         </div>
@@ -184,17 +223,24 @@ include 'includes/header.php';
                         <div class="field"><textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea></div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Send Message</button>
-                    <p style="text-align: center; color: var(--ink-soft); font-size: 0.85rem; margin-top: 12px;">We usually respond within one business day.</p>
+                    <div style="margin-top: 16px; font-size: 0.85rem; color: var(--ink-soft); display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <span style="font-weight: 500; color: var(--navy-900);">Your information is kept private.</span>
+                        </div>
+                        <span style="opacity: 0.9;">We'll only use your details to respond to your inquiry.</span>
+                    </div>
                 </form>
 
-                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border); text-align: center;">
-                    <h4 style="font-size: 1.05rem; margin-bottom: 16px; color: var(--navy-900);">Prefer a quick conversation?</h4>
+                <div style="margin-top: 40px; padding: 24px; background: #fcfaf5; border-radius: 12px; text-align: center; border: 1px solid #f2edd9;">
+                    <h4 style="font-size: 1.05rem; margin-bottom: 8px; color: var(--navy-900);">Prefer a quick conversation?</h4>
+                    <p style="font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 16px;">Usually replies within a few minutes during business hours.</p>
                     <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
                         <a href="https://wa.me/252636097266" target="_blank" class="btn" style="background:#25D366; color:#fff; display:inline-flex; align-items:center; gap:8px;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                             WhatsApp Us
                         </a>
-                        <a href="tel:+252636097266" class="btn btn-ghost" style="display:inline-flex; align-items:center; gap:8px;">
+                        <a href="tel:+252636097266" class="btn btn-ghost" style="display:inline-flex; align-items:center; gap:8px; background: #fff; border: 1px solid var(--border);">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                             Call Us
                         </a>

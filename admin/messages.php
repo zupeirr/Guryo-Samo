@@ -68,7 +68,7 @@ $validStatuses = ['', 'Unread', 'Read', 'Replied', 'Closed'];
 if (!in_array($status, $validStatuses, true)) { $status = ''; }
 
 // ── Build WHERE ───────────────────────────────────────────────────────────────
-$where  = ["is_archived = $archive"];
+$where  = ["m.is_archived = $archive"];
 $params = [];
 $types  = '';
 
@@ -89,9 +89,14 @@ $whereSql = 'WHERE ' . implode(' AND ', $where);
 // ── Count ─────────────────────────────────────────────────────────────────────
 $countSql  = "SELECT COUNT(*) AS c FROM messages m $whereSql";
 $countStmt = $conn->prepare($countSql);
-if ($params) { $countStmt->bind_param($types, ...$params); }
-$countStmt->execute();
-$totalRows = (int)$countStmt->get_result()->fetch_assoc()['c'];
+if (!$countStmt) {
+    error_log('[Guryo Samo] messages.php count prepare failed: ' . $conn->error);
+    $totalRows = 0;
+} else {
+    if ($params) { $countStmt->bind_param($types, ...$params); }
+    $countStmt->execute();
+    $totalRows = (int)$countStmt->get_result()->fetch_assoc()['c'];
+}
 
 // ── Paginate ──────────────────────────────────────────────────────────────────
 $pg = paginate($totalRows, $perPage);
@@ -214,7 +219,7 @@ include 'includes/admin-header.php';
                     $isUnread   = !$m['is_read'];
                     $isImportant = $m['priority'] === 'Important';
                     $propImg = ($m['property_image'] && $m['property_image'] !== 'no-image.jpg')
-                               ? '../uploads/' . $m['property_image']
+                               ? '../image.php?type=property&id=' . $m['property_id']
                                : '../assets/images/no-image.jpg';
                     $statusColors = [
                         'Unread'  => '#dc2626',

@@ -99,7 +99,7 @@ include 'includes/admin-header.php';
 <div class="panel">
     <div class="panel-head"><h2><?php echo $editTask ? 'Edit Task' : 'New Work Order / Task'; ?></h2></div>
     <div class="panel-body">
-        <form method="POST" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:700px;">
+        <form method="POST" class="admin-form" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:700px;">
             <?php if($editTask): ?><input type="hidden" name="id" value="<?php echo $editTask['id']; ?>"><?php endif; ?>
             <div style="grid-column:span 2;">
                 <label class="form-label">Task Title *</label>

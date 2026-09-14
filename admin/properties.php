@@ -154,14 +154,14 @@ include 'includes/admin-header.php';
             <tbody>
                 <?php if ($result->num_rows > 0): while ($p = $result->fetch_assoc()):
                     $imgSrc = ($p['image'] && $p['image'] !== 'no-image.jpg')
-                        ? '../uploads/' . $p['image']
+                        ? '../image.php?type=property&id=' . $p['id']
                         : '../assets/images/no-image.jpg';
                     $statusClass = $p['status'] === 'For Sale' ? 'sale' : ($p['status'] === 'For Rent' ? 'rent' : 'sold');
                 ?>
-                <tr>
+                <tr onclick="window.location.href='edit-property.php?id=<?php echo $p['id']; ?>'">
                     <td><img src="<?php echo clean($imgSrc); ?>" class="thumb" alt=""></td>
                     <td><span style="font-family:monospace; font-size:0.78rem; color:var(--ink-soft); white-space:nowrap;"><?php echo clean($p['property_ref']); ?></span></td>
-                    <td><?php echo clean($p['title']); ?></td>
+                    <td><a href="edit-property.php?id=<?php echo $p['id']; ?>" class="property-title-link"><?php echo clean($p['title']); ?></a></td>
                     <td><?php echo clean($p['type']); ?></td>
                     <td><?php echo formatPrice($p['price']); ?></td>
                     <td><?php echo clean($p['location']); ?></td>

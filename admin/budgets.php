@@ -36,7 +36,7 @@ $budgets = $stmt->get_result();
 include 'includes/admin-header.php';
 ?>
 <div class="dash-stats" style="margin-bottom:1.5rem;">
-    <div class="dash-card"><div class="ic-wrap teal">💼</div><div><h3><?php echo (int)$totalRows; ?></h3><span>Total Budgets</span></div></div>
+    <div class="dash-card"><div class="ic-wrap blue"><i data-lucide="wallet" style="width:20px;height:20px;"></i></div><div><h3><?php echo (int)$totalRows; ?></h3><span>Total Budgets</span></div></div>
 </div>
 
 <div class="panel">
