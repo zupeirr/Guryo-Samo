@@ -1,20 +1,52 @@
 <?php
+/**
+ * =========================================================================
+ * index.php  —  Home Page (Public)
+ * =========================================================================
+ *
+ * PURPOSE:
+ *   The main landing page of the Guryo Samo website. Visitors see:
+ *   - A hero section with a search bar
+ *   - Animated stats strip (total properties, for sale, for rent, sold)
+ *   - Featured/recent property listings (latest 6)
+ *   - "Why Choose Us" section
+ *
+ * DATA LOADED:
+ *   - 4 property counts from the database (for the stats strip)
+ *   - 6 most recently added properties (for the featured listings grid)
+ * =========================================================================
+ */
+
+// Temporarily show all PHP errors so we can spot any issues during development.
+// Remove or set to 0 on a live/production server!
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+// Load the database connection and shared helper functions
 require_once 'config/db.php';
 require_once 'includes/functions.php';
 
-$pageTitle = 'Home';
+// Variables used by includes/header.php to set the title and highlight the nav link
+$pageTitle  = 'Home';
 $activePage = 'home';
-$baseUrl = '';
+$baseUrl    = ''; // Empty string = we are at the root level (no folder prefix needed)
 
-// ---- Stats for the strip ----
+// ── Stats Strip ─────────────────────────────────────────────────────────────────
+// These four queries count properties by status and display them as animated counters.
+// The 'AS c' alias names the result column 'c' so we can access it with ['c'].
 $totalProperties = $conn->query("SELECT COUNT(*) AS c FROM properties")->fetch_assoc()['c'];
-$forSaleCount   = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Sale'")->fetch_assoc()['c'];
-$forRentCount   = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Rent'")->fetch_assoc()['c'];
-$soldCount      = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='Sold'")->fetch_assoc()['c'];
+$forSaleCount    = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Sale'")->fetch_assoc()['c'];
+$forRentCount    = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Rent'")->fetch_assoc()['c'];
+$soldCount       = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='Sold'")->fetch_assoc()['c'];
 
-// ---- Featured properties (latest 6) ----
+// ── Featured Properties ──────────────────────────────────────────────────────
+// Fetch the 6 most recently added properties to show in the "Featured Listings" grid.
+// ORDER BY created_at DESC = newest first.
+// LIMIT 6 = only get 6 rows so we don't overload the page.
 $featured = $conn->query("SELECT * FROM properties ORDER BY created_at DESC LIMIT 6");
 
+// Include the shared site header (outputs <!DOCTYPE html>, <head>, <header> navbar)
 include 'includes/header.php';
 ?>
 
@@ -106,9 +138,22 @@ include 'includes/header.php';
         </div>
 
         <div class="property-grid">
-            <?php if ($featured->num_rows > 0): while ($p = $featured->fetch_assoc()):                   //--loop oo hubinaya haddii database-ka laga helay properties,kadibna mid-mid ayuu u soo qaadanayaa -->
-                $statusClass = $p['status'] === 'For Sale' ? 'sale' : ($p['status'] === 'For Rent' ? 'rent' : 'sold');            //--- This is a ternary operator (if/else)
-                $imgSrc = ($p['image'] && $p['image'] !== 'no-image.jpg') ? 'image.php?type=property&id=' . $p['id'] : 'assets/images/no-image.jpg';
+            <?php
+            // Loop through featured properties.
+            // num_rows > 0 — checks if any rows were returned before looping.
+            // fetch_assoc() — fetches the next row as an associative array (column name => value).
+            if ($featured->num_rows > 0): while ($p = $featured->fetch_assoc()):
+
+                // Determine the CSS badge class for this property's status.
+                // Ternary operator: condition ? value_if_true : value_if_false
+                $statusClass = $p['status'] === 'For Sale' ? 'sale' : ($p['status'] === 'For Rent' ? 'rent' : 'sold');
+
+                // Build the image source URL.
+                // If the property has an image in the DB, use image.php to serve it.
+                // Otherwise fall back to the static placeholder image.
+                $imgSrc = ($p['image'] && $p['image'] !== 'no-image.jpg')
+                    ? 'image.php?type=property&id=' . $p['id']
+                    : 'assets/images/no-image.jpg';
             ?>
             <div class="property-card">
                 <div class="property-thumb">
