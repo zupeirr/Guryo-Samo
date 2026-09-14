@@ -66,7 +66,7 @@ function navIcon(string $name): string {
         </div>
 
         <!-- Properties -->
-        <div class="nav-group <?php echo in_array($activeAdminPage, ['properties','add','pending','available','sold','rented']) ? 'open active-group' : ''; ?>">
+        <div class="nav-group <?php echo in_array($activeAdminPage, ['properties','add','pending','available','sold','rented','bulk-upload-images']) ? 'open active-group' : ''; ?>">
             <button class="nav-group-toggle">
                 <span class="ic"><?php echo navIcon('properties'); ?></span>
                 <span>Properties</span>
@@ -75,6 +75,7 @@ function navIcon(string $name): string {
             <div class="nav-group-children">
                 <a href="properties.php" class="<?php echo $activeAdminPage === 'properties' ? 'active' : ''; ?>">All Properties</a>
                 <a href="add-property.php" class="<?php echo $activeAdminPage === 'add' ? 'active' : ''; ?>">Add Property</a>
+                <a href="bulk-upload-images.php" class="<?php echo $activeAdminPage === 'bulk-upload-images' ? 'active' : ''; ?>">Bulk Upload Images</a>
                 <a href="properties.php?status=Pending" class="<?php echo $activeAdminPage === 'pending' ? 'active' : ''; ?>">Pending Approval</a>
                 <a href="properties.php?status=For+Sale" class="<?php echo $activeAdminPage === 'available' ? 'active' : ''; ?>">Available</a>
                 <a href="properties.php?status=Sold" class="<?php echo $activeAdminPage === 'sold' ? 'active' : ''; ?>">Sold</a>
