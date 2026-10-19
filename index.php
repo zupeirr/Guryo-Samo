@@ -17,13 +17,8 @@
  * =========================================================================
  */
 
-// Temporarily show all PHP errors so we can spot any issues during development.
-// Remove or set to 0 on a live/production server!
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-
-// Load the database connection and shared helper functions
+// Load the database connection and shared helper functions.
+// Error reporting level is controlled by APP_ENV in the .env file.
 require_once 'config/db.php';
 require_once 'includes/functions.php';
 
@@ -35,16 +30,22 @@ $baseUrl    = ''; // Empty string = we are at the root level (no folder prefix n
 // ── Stats Strip ─────────────────────────────────────────────────────────────────
 // These four queries count properties by status and display them as animated counters.
 // The 'AS c' alias names the result column 'c' so we can access it with ['c'].
-$totalProperties = $conn->query("SELECT COUNT(*) AS c FROM properties")->fetch_assoc()['c'];
-$forSaleCount    = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Sale'")->fetch_assoc()['c'];
-$forRentCount    = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Rent'")->fetch_assoc()['c'];
-$soldCount       = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='Sold'")->fetch_assoc()['c'];
+// Note: We use plain COUNT(*) without deleted_at filter as a safe fallback until migration runs.
+$_r = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE deleted_at IS NULL");
+$totalProperties = ($_r && $_r !== false) ? (int)$_r->fetch_assoc()['c'] : (int)$conn->query("SELECT COUNT(*) AS c FROM properties")->fetch_assoc()['c'];
+$_r = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Sale' AND deleted_at IS NULL");
+$forSaleCount = ($_r && $_r !== false) ? (int)$_r->fetch_assoc()['c'] : (int)$conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Sale'")->fetch_assoc()['c'];
+$_r = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Rent' AND deleted_at IS NULL");
+$forRentCount = ($_r && $_r !== false) ? (int)$_r->fetch_assoc()['c'] : (int)$conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='For Rent'")->fetch_assoc()['c'];
+$_r = $conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='Sold' AND deleted_at IS NULL");
+$soldCount = ($_r && $_r !== false) ? (int)$_r->fetch_assoc()['c'] : (int)$conn->query("SELECT COUNT(*) AS c FROM properties WHERE status='Sold'")->fetch_assoc()['c'];
 
 // ── Featured Properties ──────────────────────────────────────────────────────
-// Fetch the 6 most recently added properties to show in the "Featured Listings" grid.
-// ORDER BY created_at DESC = newest first.
-// LIMIT 6 = only get 6 rows so we don't overload the page.
-$featured = $conn->query("SELECT * FROM properties ORDER BY created_at DESC LIMIT 6");
+// Try to use is_featured column if migration has been run, fallback to newest otherwise.
+$featured = @$conn->query("SELECT * FROM properties WHERE is_featured = 1 AND deleted_at IS NULL ORDER BY featured_order ASC LIMIT 6");
+if (!$featured || $featured === false || $featured->num_rows === 0) {
+    $featured = $conn->query("SELECT * FROM properties ORDER BY created_at DESC LIMIT 6");
+}
 
 // Include the shared site header (outputs <!DOCTYPE html>, <head>, <header> navbar)
 include 'includes/header.php';
@@ -84,8 +85,11 @@ include 'includes/header.php';
                 </select>
             </div>
             <div class="field">
-                <label for="q_max">Max Price</label>
-                <input type="number" id="q_max" name="max_price" placeholder="e.g. 300000">
+                <label>Price Range</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="number" name="min_price" placeholder="Min" style="width:50%;">
+                    <input type="number" name="max_price" placeholder="Max" style="width:50%;">
+                </div>
             </div>
             <div class="field" style="align-self:end;">
                 <button type="submit" class="btn btn-primary btn-block">Search</button>
@@ -148,20 +152,27 @@ include 'includes/header.php';
                 // Ternary operator: condition ? value_if_true : value_if_false
                 $statusClass = $p['status'] === 'For Sale' ? 'sale' : ($p['status'] === 'For Rent' ? 'rent' : 'sold');
 
-                // Build the image source URL.
-                // If the property has an image in the DB, use image.php to serve it.
-                // Otherwise fall back to the static placeholder image.
                 $imgSrc = ($p['image'] && $p['image'] !== 'no-image.jpg')
                     ? 'image.php?type=property&id=' . $p['id']
                     : 'assets/images/no-image.jpg';
+                    
+                $isNew = (strtotime($p['created_at']) > strtotime('-7 days'));
+                $isPriceReduced = (isset($p['previous_price']) && $p['previous_price'] > 0 && $p['previous_price'] > $p['price'] && strtotime($p['price_changed_at']) > strtotime('-30 days'));
             ?>
             <div class="property-card">
                 <div class="property-thumb">
-                    <span class="badge <?php echo $statusClass; ?>"><?php echo clean($p['status']); ?></span>
+                    <div style="position:absolute; top:12px; left:12px; display:flex; flex-direction:column; gap:6px; z-index:10;">
+                        <span class="badge <?php echo $statusClass; ?>"><?php echo clean($p['status']); ?></span>
+                        <?php if ($isPriceReduced): ?>
+                            <span class="badge" style="background:#ff3b30; color:white; animation: pulse 2s infinite;">🔥 Price Reduced</span>
+                        <?php elseif ($isNew): ?>
+                            <span class="badge" style="background:#34c759; color:white;">✨ New</span>
+                        <?php endif; ?>
+                    </div>
                     <button class="favorite-btn" aria-label="Save to favorites">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     </button>
-                    <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($p['title']); ?>" onerror="this.src='assets/images/no-image.jpg'">  <!--//---onerror = If image fails to load, show placeholder -->
+                    <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($p['title']); ?>" loading="lazy" onerror="this.src='assets/images/no-image.jpg'">  <!--//---onerror = If image fails to load, show placeholder -->
                 </div>
                 <div class="property-body">
                     <div class="property-price"><?php echo formatPrice($p['price']); ?><?php echo $p['status'] === 'For Rent' ? ' / mo' : ''; ?></div>
