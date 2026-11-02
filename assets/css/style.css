@@ -172,7 +172,7 @@ ul { list-style: none; }
     margin: 0 auto;
 }
 .nav-links a {
-    color: rgba(255,255,255,0.78);
+    color: rgb(239, 239, 239);
     font-size: 0.94rem;
     font-weight: 600;
     padding: 6px 2px;
@@ -2038,3 +2038,25 @@ html, body { overflow-x: hidden; max-width: 100vw; }
 @media (max-width: 600px) {
     .btn { white-space: normal; }
 }
+
+/* ── Sticky Mobile Contact Bar ────────────────────────────────────────── */
+.mobile-sticky-contact {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    padding: 12px 16px;
+    z-index: 1000;
+    gap: 12px;
+}
+@media (max-width: 768px) {
+    .mobile-sticky-contact {
+        display: flex;
+    }
+    /* Add bottom padding to body so content doesn't hide behind the bar */
+    body { padding-bottom: 70px; }
+}
+
