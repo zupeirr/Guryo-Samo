@@ -34,6 +34,11 @@ $similarStmt->bind_param('si', $property['type'], $id);
 $similarStmt->execute();
 $similar = $similarStmt->get_result();
 
+// SEO Data
+$metaDescription = substr(strip_tags($property['description'] ?? ''), 0, 155) . '...';
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$ogImage = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/" . $imgSrc;
+
 include 'includes/header.php';
 ?>
 
@@ -52,8 +57,8 @@ include 'includes/header.php';
             </div>
         </div>
 
-        <div class="details-hero-img">
-            <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($property['title']); ?>" onerror="this.src='assets/images/no-image.jpg'">
+        <div class="details-hero-img" style="cursor:pointer;" onclick="openLightbox(0)">
+            <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($property['title']); ?>" loading="lazy" onerror="this.src='assets/images/no-image.jpg'" id="hero-img-src">
         </div>
 
         <div class="details-grid">
@@ -101,9 +106,9 @@ include 'includes/header.php';
                 
                 <?php if (!empty($images)): ?>
                 <h3 style="font-size:1.2rem; margin:30px 0 15px;">Property Gallery</h3>
-                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px;">
-                    <?php foreach ($images as $img): ?>
-                        <img src="image.php?type=media&id=<?php echo $img['id']; ?>" style="width:100%; height:90px; object-fit:cover; border-radius:8px; cursor:pointer;" onclick="window.open(this.src, '_blank')">
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px;" id="property-gallery-container">
+                    <?php foreach ($images as $index => $img): ?>
+                        <img src="image.php?type=media&id=<?php echo $img['id']; ?>" class="gallery-img-item" data-index="<?php echo $index + 1; ?>" style="width:100%; height:90px; object-fit:cover; border-radius:8px; cursor:pointer;" onclick="openLightbox(<?php echo $index + 1; ?>)">
                     <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
@@ -138,6 +143,22 @@ include 'includes/header.php';
                         <textarea name="message" rows="4" placeholder="Is this property still available?" required style="padding:10px 12px; border:1px solid var(--border); border-radius:6px; font-size:0.9rem; font-family:inherit; resize:vertical;"></textarea>
                         <button type="submit" class="btn btn-primary btn-block">Send Inquiry</button>
                     </form>
+                    
+                    <?php 
+                    // Fetch agency phone, default to a placeholder Somaliland number if not set
+                    $waPhone = preg_replace('/[^0-9]/', '', getSetting($conn, 'contact_phone', '252630000000'));
+                    $waMessage = urlencode("Hi, I'm interested in the property: " . $property['title'] . ($property['property_ref'] ? " (Ref: " . $property['property_ref'] . ")" : ""));
+                    $waLink = "https://wa.me/{$waPhone}?text={$waMessage}";
+                    ?>
+                    
+                    <div style="text-align:center; margin: 16px 0;">
+                        <span style="color:var(--ink-soft); font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:1px;">OR</span>
+                    </div>
+                    
+                    <a href="<?php echo $waLink; ?>" target="_blank" rel="noopener noreferrer" class="btn btn-block" style="background-color:#25D366; color:white; display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        Chat on WhatsApp
+                    </a>
                 </div>
             </div>
 
@@ -174,5 +195,82 @@ include 'includes/header.php';
     </div>
 </section>
 <?php endif; ?>
+
+<!-- Sticky Mobile Contact Bar -->
+<div class="mobile-sticky-contact">
+    <a href="tel:<?php echo clean(isset($waPhone) ? '+' . $waPhone : ''); ?>" class="btn btn-outline" style="flex:1; display:flex; justify-content:center; align-items:center; gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        Call
+    </a>
+    <a href="<?php echo clean(isset($waLink) ? $waLink : ''); ?>" target="_blank" rel="noopener noreferrer" class="btn" style="flex:1; background:#25D366; color:white; border-color:#25D366; display:flex; justify-content:center; align-items:center; gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        WhatsApp
+    </a>
+</div>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" class="lightbox" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); align-items:center; justify-content:center; flex-direction:column;">
+    <button onclick="closeLightbox()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:2rem; cursor:pointer;">&times;</button>
+    <button onclick="changeLightboxImg(-1)" id="lightbox-prev" style="position:absolute; left:20px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.2); border:none; color:white; font-size:2rem; padding:10px 15px; cursor:pointer; border-radius:50%;">&lsaquo;</button>
+    <img id="lightbox-img" src="" style="max-width:90%; max-height:80vh; object-fit:contain; border-radius:8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <button onclick="changeLightboxImg(1)" id="lightbox-next" style="position:absolute; right:20px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.2); border:none; color:white; font-size:2rem; padding:10px 15px; cursor:pointer; border-radius:50%;">&rsaquo;</button>
+    <div id="lightbox-counter" style="color:white; margin-top:20px; font-size:1rem; font-family:'Inter', sans-serif;"></div>
+</div>
+
+<script>
+let lightboxImages = [];
+let currentLightboxIndex = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Gather all images (hero + gallery)
+    const heroImg = document.getElementById('hero-img-src');
+    if(heroImg) lightboxImages.push(heroImg.src);
+    
+    document.querySelectorAll('.gallery-img-item').forEach(img => {
+        lightboxImages.push(img.src);
+    });
+    
+    // Hide arrows if only 1 image
+    if(lightboxImages.length <= 1) {
+        document.getElementById('lightbox-prev').style.display = 'none';
+        document.getElementById('lightbox-next').style.display = 'none';
+    }
+});
+
+function openLightbox(index) {
+    if(lightboxImages.length === 0) return;
+    currentLightboxIndex = index;
+    updateLightbox();
+    document.getElementById('lightbox').style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // prevent scrolling
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function changeLightboxImg(dir) {
+    currentLightboxIndex += dir;
+    if (currentLightboxIndex < 0) currentLightboxIndex = lightboxImages.length - 1;
+    if (currentLightboxIndex >= lightboxImages.length) currentLightboxIndex = 0;
+    updateLightbox();
+}
+
+function updateLightbox() {
+    document.getElementById('lightbox-img').src = lightboxImages[currentLightboxIndex];
+    document.getElementById('lightbox-counter').textContent = (currentLightboxIndex + 1) + " / " + lightboxImages.length;
+}
+
+// Close on escape key or outside click
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') changeLightboxImg(-1);
+    if (e.key === 'ArrowRight') changeLightboxImg(1);
+});
+document.getElementById('lightbox').addEventListener('click', (e) => {
+    if(e.target.id === 'lightbox') closeLightbox();
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>
