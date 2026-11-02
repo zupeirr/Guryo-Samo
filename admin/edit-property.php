@@ -119,29 +119,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $imgData = is_array($imageResult) ? $imageResult['data'] : null;
                 $imgMime = is_array($imageResult) ? $imageResult['mime'] : null;
 
+                // Feature #3: Status History and Feature #6: Price Badges
+                $oldStatus = $property['status'];
+                $newStatus = $formData['status'];
+                $oldPrice  = $property['price'];
+                $newPrice  = $formData['price'];
+                
+                $priceUpdateSql = "";
+                $priceUpdateParams = [];
+                $priceUpdateTypes = "";
+                
+                if ($oldPrice != $newPrice) {
+                    $priceUpdateSql = ", previous_price=?, price_changed_at=NOW()";
+                    $priceUpdateParams[] = $oldPrice;
+                    $priceUpdateTypes .= "d";
+                }
+
                 if ($imgData !== null) {
+                    // Types: ref(s) title(s) type(s) price(d) location(s) desc(s) beds(i) baths(i) size(d) status(s) amenities(s) imgName(s) imgData(s) imgMime(s) [prevPrice(d)] id(i)
                     $stmt = $conn->prepare(
-                        "UPDATE properties SET property_ref=?, title=?, type=?, price=?, location=?, description=?, bedrooms=?, bathrooms=?, size=?, status=?, amenities=?, image=?, image_data=?, image_type=? WHERE id=?"
+                        "UPDATE properties SET property_ref=?, title=?, type=?, price=?, location=?, description=?, bedrooms=?, bathrooms=?, size=?, status=?, amenities=?, image=?, image_data=?, image_type=? $priceUpdateSql WHERE id=?"
                     );
-                    $stmt->bind_param(
-                        'sssdssiidsssssi',
+                    $bindTypes = 'sssdssiidssss' . $priceUpdateTypes . 'i'; // 14 base = ref,title,type,price,loc,desc,beds,baths,size,status,amenities,img,imgData,imgMime
+                    $bindParams = [
                         $formData['property_ref'], $formData['title'], $formData['type'], $formData['price'], $formData['location'],
                         $formData['description'], $formData['bedrooms'], $formData['bathrooms'],
-                        $formData['size'], $formData['status'], $amenitiesJson, $imgName, $imgData, $imgMime, $id
-                    );
+                        $formData['size'], $formData['status'], $amenitiesJson, $imgName, $imgData, $imgMime, ...$priceUpdateParams, $id
+                    ];
+                    $stmt->bind_param($bindTypes, ...$bindParams);
                 } else {
+                    // Types: ref(s) title(s) type(s) price(d) location(s) desc(s) beds(i) baths(i) size(d) status(s) amenities(s) imgName(s) [prevPrice(d)] id(i)
                     $stmt = $conn->prepare(
-                        "UPDATE properties SET property_ref=?, title=?, type=?, price=?, location=?, description=?, bedrooms=?, bathrooms=?, size=?, status=?, amenities=?, image=? WHERE id=?"
+                        "UPDATE properties SET property_ref=?, title=?, type=?, price=?, location=?, description=?, bedrooms=?, bathrooms=?, size=?, status=?, amenities=?, image=? $priceUpdateSql WHERE id=?"
                     );
-                    $stmt->bind_param(
-                        'sssdssiidsssi',
+                    $bindTypes = 'sssdssiidsss' . $priceUpdateTypes . 'i'; // 12 base = ref,title,type,price,loc,desc,beds,baths,size,status,amenities,img
+                    $bindParams = [
                         $formData['property_ref'], $formData['title'], $formData['type'], $formData['price'], $formData['location'],
                         $formData['description'], $formData['bedrooms'], $formData['bathrooms'],
-                        $formData['size'], $formData['status'], $amenitiesJson, $imgName, $id
-                    );
+                        $formData['size'], $formData['status'], $amenitiesJson, $imgName, ...$priceUpdateParams, $id
+                    ];
+                    $stmt->bind_param($bindTypes, ...$bindParams);
                 }
 
                 if ($stmt->execute()) {
+                    // Log status change if table exists (safe: @ suppresses error if migration not run yet)
+                    if ($oldStatus !== $newStatus) {
+                        $uid = $_SESSION['user_id'] ?? null;
+                        $note = 'Updated during property edit';
+                        $histStmt = @$conn->prepare("INSERT INTO property_status_history (property_id, old_status, new_status, changed_by, note) VALUES (?, ?, ?, ?, ?)");
+                        if ($histStmt) {
+                            $histStmt->bind_param('issis', $id, $oldStatus, $newStatus, $uid, $note);
+                            $histStmt->execute();
+                        }
+                    }
+                    
                     if (!empty($extraImages)) savePropertyMedia($conn, $id, $extraImages, 'image');
                     if ($videoName) savePropertyMedia($conn, $id, [$videoName], 'video');
                     redirect('properties.php?saved=1');

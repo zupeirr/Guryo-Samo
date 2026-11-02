@@ -22,6 +22,19 @@ if (isset($_GET['set_status'])) {
     redirect('messages.php?updated=1');
 }
 
+// Update follow-up status (CRM feature)
+if (isset($_POST['set_follow_up'])) {
+    $fid  = (int)$_POST['id'];
+    $fval = $_POST['follow_up'];
+    $allowed_f = ['New', 'Contacted', 'Viewing Booked', 'Deal Closed', 'Lost'];
+    if (in_array($fval, $allowed_f, true)) {
+        $s = $conn->prepare("UPDATE messages SET follow_up_status = ? WHERE id = ?");
+        $s->bind_param('si', $fval, $fid);
+        $s->execute();
+    }
+    redirect('messages.php?updated=1');
+}
+
 // Toggle priority
 if (isset($_GET['toggle_priority'])) {
     $pid = (int)$_GET['id'];
@@ -208,6 +221,7 @@ include 'includes/admin-header.php';
                     <th>From</th>
                     <th>Property</th>
                     <th>Subject</th>
+                    <th>Follow-Up</th>
                     <th>Status</th>
                     <th>Received</th>
                     <th>Actions</th>
@@ -234,6 +248,8 @@ include 'includes/admin-header.php';
                         'Closed'  => '#e5e7eb',
                     ];
                     $sc = $m['status'] ?? 'Unread';
+                    $fc = $m['follow_up_status'] ?? 'New';
+                    $f_opts = ['New', 'Contacted', 'Viewing Booked', 'Deal Closed', 'Lost'];
                 ?>
                 <tr style="<?php echo $isUnread ? 'font-weight:600; background:#fafbff;' : ''; ?>">
                     <!-- Priority star -->
@@ -270,6 +286,18 @@ include 'includes/admin-header.php';
                     <td style="max-width:200px; font-size:0.88rem;">
                         <?php echo clean(mb_strimwidth($m['subject'] ?: 'No Subject', 0, 50, '…')); ?>
                         <br><span style="font-size:0.75rem; color:var(--ink-soft); font-weight:400;"><?php echo clean(mb_strimwidth($m['message'], 0, 60, '…')); ?></span>
+                    </td>
+                    <!-- Follow-up CRM -->
+                    <td>
+                        <form method="POST" style="margin:0;">
+                            <input type="hidden" name="id" value="<?php echo $m['id']; ?>">
+                            <input type="hidden" name="set_follow_up" value="1">
+                            <select name="follow_up" onchange="this.form.submit()" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border); font-size:0.8rem; outline:none; cursor:pointer; background:<?php echo $fc==='New'?'#fee2e2':($fc==='Deal Closed'?'#dcfce7':($fc==='Lost'?'#f3f4f6':'#fef08a')); ?>;">
+                                <?php foreach($f_opts as $opt): ?>
+                                    <option value="<?php echo $opt; ?>" <?php echo $fc === $opt ? 'selected' : ''; ?>><?php echo $opt; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </form>
                     </td>
                     <!-- Status badge -->
                     <td>
