@@ -27,9 +27,13 @@
  */
 
 // If the calling page forgot to set $pageTitle, default to 'Home'
-if (!isset($pageTitle))  { $pageTitle  = 'Home'; }
+if (!isset($pageTitle))       { $pageTitle       = 'Home'; }
 // If the calling page forgot to set $activePage, default to empty string (no highlight)
-if (!isset($activePage)) { $activePage = ''; }
+if (!isset($activePage))      { $activePage      = ''; }
+// Optional: pages can set $metaDescription before including this file
+if (!isset($metaDescription)) { $metaDescription = ''; }
+// Optional: pages can set $ogImage (full URL) for social sharing
+if (!isset($ogImage))         { $ogImage         = ''; }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,13 +50,33 @@ $siteName = getSetting($conn, 'site_name', 'Guryo Samo');
 <!-- Browser tab title: "Page Name | Site Name" -->
 <title><?php echo clean($pageTitle); ?> | <?php echo clean($siteName); ?></title>
 
+<!-- SEO Meta Tags -->
+<?php if ($metaDescription): ?>
+<meta name="description" content="<?php echo clean($metaDescription); ?>">
+<?php else: ?>
+<meta name="description" content="<?php echo clean($siteName); ?> — Find verified properties for sale and rent in Somaliland.">
+<?php endif; ?>
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn previews) -->
+<meta property="og:type"        content="website">
+<meta property="og:site_name"   content="<?php echo clean($siteName); ?>">
+<meta property="og:title"       content="<?php echo clean($pageTitle); ?> | <?php echo clean($siteName); ?>">
+<meta property="og:description" content="<?php echo $metaDescription ? clean($metaDescription) : 'Find verified properties for sale and rent in Somaliland.'; ?>">
+<?php if ($ogImage): ?>
+<meta property="og:image" content="<?php echo clean($ogImage); ?>">
+<?php endif; ?>
+
+<!-- Favicon (place a favicon.ico in /assets/images/) -->
+<link rel="icon" type="image/x-icon" href="<?php echo $baseUrl ?? ''; ?>assets/images/favicon.ico">
+
 <!-- Google Fonts preconnect — speeds up font loading by opening the connection early -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <!-- Load Inter (body text) and Poppins (headings) fonts from Google -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 
-<!-- Main stylesheet — ?v=timestamp forces the browser to reload after changes (cache-busting) -->
-<link rel="stylesheet" href="<?php echo $baseUrl ?? ''; ?>assets/css/style.css?v=<?php echo time(); ?>">
+<!-- Main stylesheet — version string prevents stale cache on updates -->
+<link rel="stylesheet" href="<?php echo $baseUrl ?? ''; ?>assets/css/style.css?v=2.0">
 </head>
 <body>
 

@@ -122,7 +122,7 @@ $agentPerformance = $conn->query("
            (SELECT COUNT(*) FROM appointments ap WHERE ap.agent_id = a.id) AS total_appointments,
            (SELECT COUNT(*) FROM appointments ap WHERE ap.agent_id = a.id AND ap.type='Viewing') AS viewings,
            (SELECT COUNT(*) FROM appointments ap WHERE ap.agent_id = a.id AND ap.status='Completed') AS completed_viewings,
-           (SELECT COUNT(*) FROM inquiries i WHERE i.property_id IN (SELECT id FROM properties WHERE id IS NOT NULL)) AS leads_in_system,
+           (SELECT COUNT(*) FROM messages) AS leads_in_system,
            COUNT(t.id) AS deals_closed,
            COALESCE(SUM(t.amount), 0) AS revenue,
            COALESCE(SUM(t.commission), 0) AS commissions
@@ -173,8 +173,8 @@ $totalRented    = $byStatus['Rented'] ?? 0;
 $occupancyRate  = $totalProperties > 0 ? round((($totalSold + $totalRented) / $totalProperties) * 100, 1) : 0;
 
 // CRM / Lead Operations (using inquiries as leads)
-$totalInquiries  = $conn->query("SELECT COUNT(*) AS c FROM inquiries")->fetch_assoc()['c'] ?? 0;
-$unreadInquiries = $conn->query("SELECT COUNT(*) AS c FROM inquiries WHERE is_read=0")->fetch_assoc()['c'] ?? 0;
+$totalInquiries  = $conn->query("SELECT COUNT(*) AS c FROM messages")->fetch_assoc()['c'] ?? 0;
+$unreadInquiries = $conn->query("SELECT COUNT(*) AS c FROM messages WHERE is_read=0")->fetch_assoc()['c'] ?? 0;
 $totalViewings   = $conn->query("SELECT COUNT(*) AS c FROM appointments WHERE type='Viewing'")->fetch_assoc()['c'] ?? 0;
 $completedViewings = $conn->query("SELECT COUNT(*) AS c FROM appointments WHERE type='Viewing' AND status='Completed'")->fetch_assoc()['c'] ?? 0;
 $pendingAppts    = $conn->query("SELECT COUNT(*) AS c FROM appointments WHERE status='Pending'")->fetch_assoc()['c'] ?? 0;
