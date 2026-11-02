@@ -10,6 +10,7 @@ $baseUrl = '';
 $location = isset($_GET['location']) ? trim($_GET['location']) : '';
 $type     = isset($_GET['type']) ? trim($_GET['type']) : '';
 $status   = isset($_GET['status']) ? trim($_GET['status']) : '';
+$minPrice = isset($_GET['min_price']) && $_GET['min_price'] !== '' ? (float)$_GET['min_price'] : null;
 $maxPrice = isset($_GET['max_price']) && $_GET['max_price'] !== '' ? (float)$_GET['max_price'] : null;
 $sort     = isset($_GET['sort']) ? trim($_GET['sort']) : 'newest';
 
@@ -17,7 +18,7 @@ $allowedTypes = ['House','Apartment','Land','Office','Commercial','Villa'];
 $allowedStatus = ['For Sale','For Rent','Sold'];
 
 // ---- Build query safely with prepared statement ----
-$sql = "SELECT * FROM properties WHERE 1=1";
+$sql = "SELECT * FROM properties WHERE deleted_at IS NULL";
 $params = [];
 $types = '';
 
@@ -35,6 +36,11 @@ if ($status !== '' && in_array($status, $allowedStatus, true)) {
     $sql .= " AND status = ?";
     $params[] = $status;
     $types .= 's';
+}
+if ($minPrice !== null && $minPrice >= 0) {
+    $sql .= " AND price >= ?";
+    $params[] = $minPrice;
+    $types .= 'd';
 }
 if ($maxPrice !== null && $maxPrice > 0) {
     $sql .= " AND price <= ?";
@@ -61,8 +67,7 @@ if ($sort === 'price_asc') {
 } elseif ($sort === 'price_desc') {
     $sql .= " ORDER BY price DESC LIMIT ? OFFSET ?";
 } elseif ($sort === 'popular') {
-    // Assuming views or just fallback to newest for now
-    $sql .= " ORDER BY id ASC LIMIT ? OFFSET ?"; 
+    $sql .= " ORDER BY view_count DESC, created_at DESC LIMIT ? OFFSET ?"; 
 } else {
     $sql .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
 }
@@ -115,8 +120,11 @@ include 'includes/header.php';
                 </select>
             </div>
             <div class="field">
-                <label for="f_max">Max Price</label>
-                <input type="number" id="f_max" name="max_price" value="<?php echo $maxPrice ? clean($maxPrice) : ''; ?>" placeholder="e.g. 300000">
+                <label>Price Range</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="number" name="min_price" value="<?php echo $minPrice ? clean($minPrice) : ''; ?>" placeholder="Min" style="width:50%;">
+                    <input type="number" name="max_price" value="<?php echo $maxPrice ? clean($maxPrice) : ''; ?>" placeholder="Max" style="width:50%;">
+                </div>
             </div>
             <div class="field" style="align-self:end;">
                 <button type="submit" class="btn btn-primary btn-block">Search</button>
@@ -136,6 +144,7 @@ include 'includes/header.php';
                 <input type="hidden" name="location" value="<?php echo clean($location); ?>">
                 <input type="hidden" name="type" value="<?php echo clean($type); ?>">
                 <input type="hidden" name="status" value="<?php echo clean($status); ?>">
+                <input type="hidden" name="min_price" value="<?php echo $minPrice ? clean($minPrice) : ''; ?>">
                 <input type="hidden" name="max_price" value="<?php echo $maxPrice ? clean($maxPrice) : ''; ?>">
                 
                 <label for="sort" style="font-size: 0.9rem; font-weight: 600; color: var(--navy-800);">Sort by:</label>
@@ -152,14 +161,26 @@ include 'includes/header.php';
             <?php if ($result->num_rows > 0): while ($p = $result->fetch_assoc()):
                 $statusClass = $p['status'] === 'For Sale' ? 'sale' : ($p['status'] === 'For Rent' ? 'rent' : 'sold');
                 $imgSrc = ($p['image'] && $p['image'] !== 'no-image.jpg') ? 'image.php?type=property&id=' . $p['id'] : 'assets/images/no-image.jpg';
+                
+                $isNew = (strtotime($p['created_at']) > strtotime('-7 days'));
+                $isPriceReduced = (isset($p['previous_price']) && $p['previous_price'] > 0 && $p['previous_price'] > $p['price'] && strtotime($p['price_changed_at']) > strtotime('-30 days'));
             ?>
             <div class="property-card">
                 <div class="property-thumb">
-                    <span class="badge <?php echo $statusClass; ?>"><?php echo clean($p['status']); ?></span>
+                    <div style="position:absolute; top:12px; left:12px; display:flex; flex-direction:column; gap:6px; z-index:10;">
+                        <span class="badge <?php echo $statusClass; ?>"><?php echo clean($p['status']); ?></span>
+                        <?php if ($isPriceReduced): ?>
+                            <span class="badge" style="background:#ff3b30; color:white; animation: pulse 2s infinite;">🔥 Price Reduced</span>
+                        <?php elseif ($isNew): ?>
+                            <span class="badge" style="background:#34c759; color:white;">✨ New</span>
+                        <?php endif; ?>
+                    </div>
                     <button class="favorite-btn" aria-label="Save to favorites">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     </button>
-                    <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($p['title']); ?>" onerror="this.src='assets/images/no-image.jpg'">
+                    <a href="property-details.php?id=<?php echo $p['id']; ?>">
+                        <img src="<?php echo clean($imgSrc); ?>" alt="<?php echo clean($p['title']); ?>" loading="lazy" onerror="this.src='assets/images/no-image.jpg'">
+                    </a>
                 </div>
                 <div class="property-body">
                     <div class="property-price"><?php echo formatPrice($p['price']); ?><?php echo $p['status'] === 'For Rent' ? ' / mo' : ''; ?></div>
@@ -174,7 +195,10 @@ include 'includes/header.php';
                 </div>
             </div>
             <?php endwhile; else: ?>
-                <p class="empty-state">No properties match your search. Try adjusting your filters.</p>
+                <div class="empty-state" style="text-align:center; padding: 40px 20px; grid-column: 1 / -1;">
+                    <p style="margin-bottom:16px;">No properties match your search. Try adjusting your filters.</p>
+                    <a href="properties.php" class="btn btn-navy" style="display:inline-block;">Clear Filters</a>
+                </div>
             <?php endif; ?>
         </div>
 

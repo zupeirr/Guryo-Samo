@@ -16,6 +16,12 @@ if (!$mysqli->select_db("real_estate_db")) {
 $result = $mysqli->query("SHOW TABLES LIKE 'users'");
 if ($result && $result->num_rows > 0) {
     echo "Database already exists and is set up.\n";
+    $u = $mysqli->query("SELECT id FROM users WHERE username = 'admin'");
+    if (!$u || $u->num_rows === 0) {
+        $hash = password_hash('Admin@123', PASSWORD_BCRYPT);
+        $mysqli->query("INSERT INTO users (full_name, username, email, password, role) VALUES ('System Administrator', 'admin', 'admin@guryosamo.com', '$hash', 'admin')");
+        echo "Default admin user created.\n";
+    }
     $mysqli->close();
     exit(0);
 }
