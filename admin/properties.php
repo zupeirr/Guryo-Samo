@@ -44,6 +44,8 @@ if ($type !== '') {
     $types   .= 's';
 }
 
+$where[] = 'deleted_at IS NULL';
+
 $whereSql = count($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
 // ---- Count total matching rows ----
@@ -170,7 +172,8 @@ include 'includes/admin-header.php';
                     <td>
                         <div class="row-actions">
                             <a href="edit-property.php?id=<?php echo (int)$p['id']; ?>" class="btn btn-ghost btn-sm">Edit</a>
-                            <a href="delete-property.php?id=<?php echo (int)$p['id']; ?>"
+                            <a href="property-history.php?id=<?php echo (int)$p['id']; ?>" class="btn btn-ghost btn-sm">History</a>
+                            <a href="delete-property.php?id=<?php echo (int)$p['id']; ?>&csrf_token=<?php echo csrfToken(); ?>"
                                class="btn btn-danger btn-sm js-confirm-delete"
                                data-label="<?php echo clean($p['title']); ?>">Delete</a>
                         </div>
