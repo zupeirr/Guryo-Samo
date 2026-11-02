@@ -80,6 +80,8 @@ function navIcon(string $name): string {
                 <a href="properties.php?status=For+Sale" class="<?php echo $activeAdminPage === 'available' ? 'active' : ''; ?>">Available</a>
                 <a href="properties.php?status=Sold" class="<?php echo $activeAdminPage === 'sold' ? 'active' : ''; ?>">Sold</a>
                 <a href="properties.php?status=For+Rent" class="<?php echo $activeAdminPage === 'rented' ? 'active' : ''; ?>">Rented</a>
+                <a href="featured-properties.php" class="<?php echo $activeAdminPage === 'featured' ? 'active' : ''; ?>">⭐ Featured Properties</a>
+                <a href="archived-properties.php" class="<?php echo $activeAdminPage === 'archived' ? 'active' : ''; ?>">🗑️ Recycle Bin</a>
             </div>
         </div>
 
@@ -92,7 +94,10 @@ function navIcon(string $name): string {
             </button>
             <div class="nav-group-children">
                 <a href="customers.php" class="<?php echo $activeAdminPage === 'customers' ? 'active' : ''; ?>">Customer Directory</a>
-                <a href="messages.php" class="<?php echo $activeAdminPage === 'messages' ? 'active' : ''; ?>">All Messages</a>
+                <a href="messages.php" class="<?php echo $activeAdminPage === 'messages' ? 'active' : ''; ?>" style="display:flex; justify-content:space-between; align-items:center;">
+                    All Messages
+                    <span id="sidebarMsgBadge" style="display:none; background:var(--gold-500); color:var(--navy-900); border-radius:10px; padding:2px 8px; font-size:0.75rem; font-weight:700;"></span>
+                </a>
             </div>
         </div>
 
