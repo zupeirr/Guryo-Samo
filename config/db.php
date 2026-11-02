@@ -5,54 +5,76 @@
  * =========================================================================
  *
  * PURPOSE:
- *   This file opens ONE shared MySQL database connection ($conn) that every
- *   other page in the project re-uses. It is loaded with `require_once` so
- *   PHP only connects to the database ONCE per request, no matter how many
- *   files include it.
+ *   Opens ONE shared MySQL database connection ($conn) reused across every
+ *   page. Credentials are loaded from the project-root .env file so they
+ *   are never hardcoded or committed to version control.
  *
  * HOW TO USE IT IN OTHER FILES:
- *   At the top of any PHP file that needs the database, add:
- *       require_once 'config/db.php';     (from the root folder)
- *       require_once '../config/db.php';  (from sub-folders like /admin)
- *   After that, the variable $conn is available everywhere on the page.
+ *   require_once 'config/db.php';     (from the root folder)
+ *   require_once '../config/db.php';  (from sub-folders like /admin)
  *
  * HOW TO CONFIGURE:
- *   Update the 4 constants below to match your own XAMPP / MySQL setup.
- *   A default XAMPP install normally uses: root / (empty password).
+ *   Edit the .env file in the project root. Never edit this file directly.
  * =========================================================================
  */
 
-// ── Database credentials ──────────────────────────────────────────────────
-// Change these values if your MySQL server uses different settings.
+// ── Load credentials from .env ────────────────────────────────────────────
+// parse_ini_file() reads "KEY=value" lines into an associative array.
+// We look for .env two levels up from /config/ so it always resolves to
+// the project root, no matter where in the project this file is included.
+$envFile = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
 
-define('DB_HOST', 'localhost');       // The server where MySQL is running (usually 'localhost')
-define('DB_USER', 'root');            // MySQL username (default XAMPP user is 'root')
-define('DB_PASS', '');                // MySQL password (default XAMPP has no password — empty string)
-define('DB_NAME', 'real_estate_db');  // The name of the database (created from database/real_estate.sql)
-define('DB_PORT', 3307);              // MySQL port — XAMPP uses 3307 to avoid conflict with Windows MySQL80 service
+if (file_exists($envFile)) {
+    $env = parse_ini_file($envFile);
+} else {
+    // Fallback defaults (only for first-time local setup without a .env file).
+    // On a production server this file MUST exist.
+    $env = [
+        'DB_HOST' => 'localhost',
+        'DB_PORT' => 3306,
+        'DB_USER' => 'root',
+        'DB_PASS' => '',
+        'DB_NAME' => 'real_estate_db',
+        'APP_ENV' => 'development',
+    ];
+}
 
-// ── Turn off automatic error throwing ────────────────────────────────────
-// By default, newer PHP versions throw exceptions on MySQL errors.
-// We switch that off so we can handle errors ourselves more gracefully.
+define('DB_HOST', $env['DB_HOST'] ?? 'localhost');
+define('DB_PORT', (int)($env['DB_PORT'] ?? 3306));
+define('DB_USER', $env['DB_USER'] ?? 'root');
+define('DB_PASS', $env['DB_PASS'] ?? '');
+define('DB_NAME', $env['DB_NAME'] ?? 'real_estate_db');
+define('APP_ENV', $env['APP_ENV'] ?? 'development');
+
+// ── Configure error reporting based on environment ───────────────────────
+// In development: show errors on screen so you can debug quickly.
+// In production:  hide errors from visitors (log them to file instead).
+if (APP_ENV === 'production') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '0');
+    ini_set('display_startup_errors', '0');
+    ini_set('log_errors', '1');
+    // Ensure the logs directory exists before writing to it
+    $logDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'logs';
+    if (!is_dir($logDir)) { mkdir($logDir, 0755, true); }
+    ini_set('error_log', $logDir . DIRECTORY_SEPARATOR . 'php_errors.log');
+} else {
+    // Development — show all errors
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+}
+
+// ── Turn off automatic MySQLi exception throwing ──────────────────────────
 mysqli_report(MYSQLI_REPORT_OFF);
 
 // ── Open the database connection ──────────────────────────────────────────
-// We use MySQLi (MySQL Improved) in Object-Oriented style.
-// $conn is the connection object — all SQL queries in the project use it.
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
 
 // ── Handle connection failure ─────────────────────────────────────────────
-// If the connection fails (e.g. wrong password, MySQL not running),
-// we log the real error privately and show a friendly message to the visitor.
-// We NEVER show raw MySQL errors to users — that would be a security risk.
 if ($conn->connect_error) {
-    // Write the real error to the server's error log (only admins can see this)
     error_log('[Guryo Samo DB] Connection failed: ' . $conn->connect_error);
-
-    // Send HTTP 503 "Service Unavailable" status code to the browser
     http_response_code(503);
-
-    // Show a user-friendly "We'll be right back" page instead of a scary error
     echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
         <title>Service Unavailable</title>
         <style>body{font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#101d2c;color:#fff;}
@@ -62,10 +84,8 @@ if ($conn->connect_error) {
             <h1>We\'ll be right back</h1>
             <p>We\'re experiencing a temporary issue. Please try again in a few moments.</p>
         </div></body></html>';
-    exit; // Stop all further PHP execution
+    exit;
 }
 
 // ── Set the character encoding ────────────────────────────────────────────
-// utf8mb4 allows the database to store any language, special characters,
-// and even emoji. This is the safest encoding for international content.
 $conn->set_charset('utf8mb4');

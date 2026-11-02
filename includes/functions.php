@@ -29,7 +29,7 @@
 /* ── 1. SESSION ──────────────────────────────────────────────────────────
    Start the PHP session if it has not been started yet.
    Sessions let us store data across page loads (e.g. who is logged in).
-   We check first because calling session_start() twice causes an error. */
+   We check first because calling session_start() twice causes an error. (if)- prevents a crash if session_start() is called twice*/
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 
